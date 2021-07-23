@@ -1,0 +1,1 @@
+{"itemsToDrop": "", "delayBeforeStarting": 3, "clickDelay": 1, "escapeKey": "esc", "clicksBeforeDrop": 5, "programLoc": "D:\\OneDrive\\Sorted\\Programming\\Python\\Ark Farming", "autoClickShortcut": "^O", "autoMoveShortcut": "^W", "otherInvSearchX": 1269, "otherInvSearchY": 184, "otherInvDropAllX": 1473, "otherInvDropAllY": 189, "acceptX": 789, "accceptY": 596}

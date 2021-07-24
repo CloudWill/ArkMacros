@@ -18,9 +18,9 @@ goto :install
 		pip install pyautogui
 		echo.
 		echo.
-		::reset to default settings. Then change the screenshot size
+		::reset to default settings. Then change the default position for the autoclicker to drop
+		python SetupFiles\Main.py 4
 		python SetupFiles\Main.py 3
-		python SetupFiles\Main.py 1
 		goto :endofscript
 	)
 

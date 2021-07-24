@@ -8,6 +8,7 @@ import Config
 import AhkSettings
 import AutoClickerDrop
 import AutoMoveForward
+import AutoE
 
 def run_option(data, option):
     directoryPath = os.path.abspath(os.path.join(os.path.dirname(__file__)))
@@ -20,7 +21,10 @@ def run_option(data, option):
     elif option == "4":
         Config.reset_settings()
     elif option == "5":
+        data = Config.set_settings()
         AhkSettings.start_ahk(data)
+    elif option == "6":
+        AutoE.auto_e(data)
     elif option == "0":
         print("Exiting")
     else:
@@ -29,9 +33,6 @@ def run_option(data, option):
 
 #gets the data
 data = Config.set_settings()
-
-#exits the program if the esc key is detected
-keyboard.hook(Config.exit_on_key(data["escapeKey"]))
 
 # to see if it's user run or script run
 n = len(sys.argv)
@@ -44,6 +45,7 @@ if n == 1:
                     f" 3 - Change the auto-clicker mouse location for drop \n"
                     f" 4 - Reset All Settings \n"
                     f" 5 - Start Ahk\n"
+                    f" 6 - Start auto \"e\"\n"
                     f" 0 - exit \n ")
         run_option(data, var)
 

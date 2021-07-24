@@ -33,6 +33,7 @@ def reset_settings():
     with open(directoryPath + '\\Settings.txt', 'w') as f:
         json.dump(defaultSettings, f)
 
+        AhkSettings.start_ahk(defaultSettings)
         set_bats(directoryPath, requiredFilesLoc, "autoDrop", 1)
         set_bats(directoryPath, requiredFilesLoc, "autoW", 2)
         set_bats(directoryPath, requiredFilesLoc, "autoE", 6)

@@ -15,7 +15,6 @@ def auto_e(data):
         if keyboard.is_pressed(data["escapeKey"]):
             cont = False
         pyautogui.press("e")
-        if keyboard.is_pressed(data["escapeKey"]):
-            cont = False
+
 
     os._exit(1)

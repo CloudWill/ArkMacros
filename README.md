@@ -31,7 +31,13 @@ Auto Clicker + Drop
  *** If the mouse does not move to the correct location, run the "autoDropCalibration.bat" and following the prompts by moving your mouse to the search bar, drop all and accept ***
 
 Auto Move forward
-  - This macro will move your character forward
+  - This macro will move your character forward by pressing "w"
+  - Press the right shift once if you want to sprint
+  - The .bat file is called autoW.bat
+  - The default shortcut for AHK is ctrl + w
+
+Auto E
+  - This macro will keep pressing "e"
   - The .bat file is called autoW.bat
   - The default shortcut for AHK is ctrl + w
 

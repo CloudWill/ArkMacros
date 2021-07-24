@@ -16,5 +16,4 @@ def auto_e(data):
             cont = False
         pyautogui.press("e")
 
-
     os._exit(1)

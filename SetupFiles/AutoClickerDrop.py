@@ -28,14 +28,14 @@ def auto_click_drop(data):
         for item in items:
 
             #moves to "other" search bar and writes
-            pyautogui.moveTo(data["otherInvSearchX"], data["otherInvSearchY"], 0.2, pyautogui.easeInOutQuad)
+            pyautogui.moveTo(data["otherInvSearchX"], data["otherInvSearchY"], 1, pyautogui.easeInOutQuad)
             pyautogui.click()
             pyautogui.write(item, interval=0.05)
             #drop all
-            pyautogui.moveTo(data["otherInvDropAllX"], data["otherInvDropAllY"], 0.2, pyautogui.easeInOutQuad)
+            pyautogui.moveTo(data["otherInvDropAllX"], data["otherInvDropAllY"], 1, pyautogui.easeInOutQuad)
             pyautogui.click()
             #click accept
-            pyautogui.moveTo(data["acceptX"], data["acceptY"], 0.2, pyautogui.easeInOutQuad)
+            pyautogui.moveTo(data["acceptX"], data["acceptY"], 1, pyautogui.easeInOutQuad)
             pyautogui.click()
         pyautogui.press('f')
 

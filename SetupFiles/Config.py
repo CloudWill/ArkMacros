@@ -53,3 +53,7 @@ def set_bats(directoryPath,requiredFilesLoc, fileName, value):
 
     f.write(f'python.exe \"{directoryPath}\\{requiredFilesLoc}\\Main.py" {value}')
     f.close()
+
+def exit_script():
+    pyautogui.press("esc")
+

@@ -1,3 +1,6 @@
 SetupFiles/__pycache__/
 __pycache__/
 .idea/
+Server/.vs
+Server/ark-macro/ark-macros/.vs
+Server/ark-macro/ark-macros/node_modules

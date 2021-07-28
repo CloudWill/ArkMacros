@@ -25,6 +25,8 @@ def run_option(data, option):
         AhkSettings.start_ahk(data)
     elif option == "6":
         AutoE.auto_e(data)
+    elif option == "99":
+        os._exit(1)
     elif option == "0":
         print("Exiting")
     else:

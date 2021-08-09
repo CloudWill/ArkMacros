@@ -5,7 +5,7 @@ import numpy as np
 def nothing(x):
     pass
 
-image_loc = r'D:\OneDrive\Sorted\Programming\Python\Ark Farming\OCR\Images\tribelog4.png'
+image_loc = r'D:\OneDrive\Sorted\Programming\Python\Ark Farming\OCR\Images\tribe 7.png'
 # Load in image
 image = cv2.imread(image_loc)
 

@@ -5,7 +5,7 @@ import sys
 import json
 from pathlib import Path
 import time
-import Config
+
 
 def auto_click_drop(data):
     # exits the program if the esc key is detected
@@ -56,7 +56,6 @@ def change_mouse_pos_auto_click_drop(data):
     data["acceptX"] = acceptX
     data["acceptY"] = acceptY
 
-    settingsPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     with open(data["programLoc"] + '\\Settings.txt', 'w') as f:
         json.dump(data, f)
 

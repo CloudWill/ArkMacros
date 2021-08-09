@@ -1,32 +1,219 @@
 import pytesseract
 import cv2
 import numpy as np
+import pyautogui
+import json
+import os
+from datetime import datetime
+import json
+import glob
+import pyodbc
+import keyboard
+import time
 
 #https://techtutorialsx.com/2019/04/13/python-opencv-converting-image-to-black-and-white/
 
-image_loc = r'D:\OneDrive\Sorted\Programming\Python\Ark Farming\OCR\Images\tribelog4.png'
+def createDb():
 
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
+    # ODB settings
 
-image = cv2.imread(image_loc)
+    driver = "SQL Server"
+    server = "DESKTOP-HESFTCJ"
+    db = "ArkData"
+    user = "local123"
+    password = "local123"
 
-grayImage = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # creating connection Object which will contain SQL Server Connection
+    sql_conn = pyodbc.connect('driver={%s};server=%s;database=%s;trusted_connection=yes' % (driver, server, db))
+    cursor = sql_conn.cursor()
 
-hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    # Processing Query
+    cursor.execute('''
 
-# Define lower and uppper limits of what we call "brown"
-lo = np.array([0, 0, 158])
-hi = np.array([179, 255, 255])
+           CREATE TABLE Category
+           (
+            CategoryId int IDENTITY(1,1) PRIMARY KEY,
+            CategoryName nvarchar(100)           
+           );
+		   
+		 	   CREATE TABLE TribeLogsVal
+           (
+           TribeLogsValId int IDENTITY(1,1) PRIMARY KEY,
+           InGameDay nvarchar(500),
+           Msg nvarchar(500),
+           CategoryId int FOREIGN KEY REFERENCES Category(CategoryId),
+		   Ts datetime
+           );
+           
+        INSERT INTO Category (CategoryName)
+            VALUES ('froze'),
+                 ('starved'),
+                 ('tamed'),
+                 ('added'),
+                 ('killed'),
+                 ('destroyed'),
+                 ('misc');
+           ''')
+    # Committing any pending transaction to the database.
+    sql_conn.commit()
+    # closing connection
+    sql_conn.close()
 
-# Mask image to only selected range
-mask = cv2.inRange(hsv, lo, hi)
 
-# Change image to white where we found found the mask
 
-image[mask > 0] = (255, 255, 255)
-cv2.imshow("purple_to_white", image)
+def saveData(text):
+    print('saving')
+    # ODB settings
 
-print(pytesseract.image_to_string(image))
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    driver = "SQL Server"
+    server = "DESKTOP-HESFTCJ"
+    db = "ArkData"
+    user = "local123"
+    password = "local123"
+
+    # creating connection Object which will contain SQL Server Connection
+    sql_conn = pyodbc.connect('driver={%s};server=%s;database=%s;trusted_connection=yes' % (driver, server, db))
+    cursor = sql_conn.cursor()
+
+    # Processing Query
+    #splits each entry to day
+    text = text.split("Day")
+    categories = ['froze', 'illed', 'starved', 'tamed', 'added', 'destro', 'misc']
+
+    #get default cate
+    cursor.execute("select CategoryId from Category where CategoryName LIKE (?)", 'misc')
+    exists = cursor.fetchone()
+    defaultId = exists[0]
+    categ = ""
+    categId = ""
+
+    # goes through each line and matches it to the first category found
+    for x in text:
+        x = x.lower()
+        categ = ""
+        categId = ""
+
+        # adds the entry to the tribe log and the categoryId
+        # how many semi colons
+        n = 3
+        groups = x.split(':')
+        datasplit = ':'.join(groups[:n]), ':'.join(groups[n:])
+        date = datasplit[0]
+        entry = datasplit[1]
+
+        for cat in categories:
+            if cat in entry:
+                cat = f'%{cat}%'
+                cursor.execute("select CategoryId from Category where CategoryName LIKE (?)", cat) #check to see if record exists
+                exists = cursor.fetchone()
+                if exists is not None:
+                    categ = cat
+                    categId = exists[0]
+                    break
+        if len(categ) == 0:
+            categId = defaultId
+
+
+        #checks to see if the entry has already been added or not
+        #OCR is finnicky so the game day or msg has to match and the category id
+        cursor.execute("select * from TribeLogsVal where (InGameDay = (?) or Msg = (?)) AND CategoryId = (?)",
+                       date, entry, categId)  # check to see if record exists
+        exists = cursor.fetchone()
+
+        if exists is None:
+            cursor.execute(
+                "INSERT INTO TribeLogsVal (InGameDay, Msg, CategoryId, DiscordBot, Ts) VALUES (?,?,?,?,?)",
+                date, entry, categId,0, datetime.now())
+            # Committing any pending transaction to the database.
+    sql_conn.commit()
+    # closing connection
+    sql_conn.close()
+
+
+    # addText(text)
+
+
+#saves in txt
+def addText(text):
+    outfile = "./text.txt"
+    f = open(outfile, "a")
+    #text = text.splitlines()
+    f.writelines("Data Extracted from next page starts now.")
+    f.write(text)
+    f.close()
+
+
+
+def tribeLogLogging (data):
+
+    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
+
+    folder_path = f'{data["programLoc"]}\\{data["tribeLogLoc"]}'
+    file_type = '\*png'
+    files = glob.glob(folder_path + file_type)
+    image_loc = max(files, key=os.path.getctime)
+
+    #print(f'Image loc is: {image_loc}')
+
+    image = cv2.imread(image_loc)
+
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    # Define lower and uppper limits of what we call "brown"
+    loText = np.array([0, 0, 205])
+    hiText = np.array([179, 255, 255])
+
+    loDate = np.array([0, 0, 0])
+    hiDate = np.array([0, 195, 2555])
+
+
+    # Mask image to only selected range
+    mask1 = cv2.inRange(hsv, loText, hiText)
+    mask2 = cv2.inRange(hsv, loDate, hiDate)
+    mask = mask1 + mask2
+
+    # Change text to white based on mask
+
+    image[mask > 0] = (255, 255, 255)
+    # cv2.imshow("purple_to_white", image)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+
+    #print(pytesseract.image_to_string(image))
+
+    text = str(pytesseract.image_to_string(image))
+
+
+    #print(text)
+    saveData(text)
+
+def changeTribeLogLoc(data):
+    input("Press Enter after positioning mouse cursor in the top left section of tribe logs")
+    x1, y1 = pyautogui.position()
+
+    input("Press Enter after positioning mouse cursor in the bottom right section of tribe logs")
+    x2, y2 = pyautogui.position()
+
+    print(f'x1 is {x1} x2 is {y1} x2 is {x2} y2 is {y2}')
+
+    data["tribeLogx1"] = x1
+    data["tribeLogy1"] = y1
+    data["tribeLogx2"] = x2 - x1
+    data["tribeLogy2"] = y2 - y1
+    with open(data["programLoc"] + '\\Settings.txt', 'w') as f:
+        json.dump(data, f)
+
+
+def saveTribeLogLoc(data):
+
+    x1 = data["tribeLogx1"]
+    y1 = data["tribeLogy1"]
+    x2 = data["tribeLogx2"]
+    y2 = data["tribeLogy2"]
+    myScreenshot = pyautogui.screenshot(region=(x1, y1, x2, y2))
+    now = datetime.now().strftime("%Y-%m-%d %H%M%S")
+    pathName = f'{data["programLoc"]}\\{data["tribeLogLoc"]}\\{now}.png'
+    myScreenshot.save(pathName)
+    time.sleep(10)
+
 

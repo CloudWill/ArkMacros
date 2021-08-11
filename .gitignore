@@ -6,3 +6,7 @@ Server/ark-macro/ark-macros/.vs
 Server/ark-macro/ark-macros/node_modules
 OCR/Images
 OCR/Images/.env
+Backend/.vs
+Backend/node_modules
+Backend/package-lock.json	
+OCR/Images/JPEG

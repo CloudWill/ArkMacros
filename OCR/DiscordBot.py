@@ -4,8 +4,32 @@ from dotenv import load_dotenv
 import random
 from discord.ext import tasks, commands
 import pyodbc
+import json
+import urllib.request
+import requests
 
-@tasks.loop(seconds = 60) # repeat after every 10 seconds
+def response(url):
+    with urllib.request.urlopen(url) as response:
+        return response.read()
+
+@tasks.loop(seconds = 90) # repeat after every x seconds
+async def dataTest():
+    await client.wait_until_ready()
+    channel = client.get_channel(int(874106526023970839))
+    #API for discord bot
+    url = "http://localhost:8000/users"
+    parameters = {
+        'cat:': '\'killed\', \'destroyed\''}
+    r = requests.post(url, params=parameters)
+    jsonObject = r.json()
+    # print the keys and values
+    for x in jsonObject:
+        print(f'Day {x["InGameDay"]} : {x["Msg"]}')
+        #await channel.send(f'{x}')
+
+
+
+@tasks.loop(seconds = 90) # repeat after every x seconds
 async def myLoop():
     # ODB settings
     #print("connecting to DB")
@@ -32,9 +56,8 @@ async def myLoop():
         exists = cursor.fetchall()
         for x in exists:
             await client.wait_until_ready()
-            channel = client.get_channel(int(874233041529241631))
+            channel = client.get_channel(int(874106526023970839))
             await channel.send(f'{cat} ||| Day {x[1]} - {x[2]}')
-
             #updates to read
             cursor.execute('''
                 UPDATE TribeLogsVal
@@ -84,7 +107,20 @@ async def on_message(message):
         await message.channel.send(response)
 
 
-myLoop.start()
+#dataTest.start()
+
+url = "http://localhost:8000/users"
+parameters = {
+    'cat:': '\'froze\', \'destroyed\''}
+r = requests.post(url, params=parameters)
+jsonObject = r.json()
+# print the keys and values
+
+for x in jsonObject:
+    print(x)
 
 
-client.run(TOKEN)
+
+
+
+# client.run(TOKEN)

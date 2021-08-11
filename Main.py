@@ -48,12 +48,14 @@ def run_option(data, option):
     elif option == "10":
         OCR.TribeLogsOcr.saveTribeLogLoc(data)
     elif option == "11":
+        OCR.TribeLogsOcr.tribeLogLogging(data)
+    elif option == "12":
 
         keyboard.hook(exit_on_key(data["escapeKey"]))
         while True:
             OCR.TribeLogsOcr.saveTribeLogLoc(data)
             OCR.TribeLogsOcr.tribeLogLogging(data)
-            time.sleep(20)
+            time.sleep(15)
     elif option == "99":
         os._exit(1)
     elif option == "0":

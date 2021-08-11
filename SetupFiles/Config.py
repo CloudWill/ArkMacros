@@ -30,10 +30,10 @@ def reset_settings():
                        "otherInvDropAllY": 189,
                        "acceptX": 789,
                        "acceptY": 596,
-                       "tribeLogx1": 789,
-                       "tribeLogy1": 596,
-                       "tribeLogx2": 789,
-                       "tribeLogy2": 596,
+                       "tribeLogx1": 1782,
+                       "tribeLogy1": 236,
+                       "tribeLogx2": 617,
+                       "tribeLogy2": 1099,
                        "tribeLogLoc": tribeLogLoc
                        }
 

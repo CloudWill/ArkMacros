@@ -10,6 +10,9 @@ import glob
 import pyodbc
 import keyboard
 import time
+import json
+import urllib.request
+import requests
 
 
 # https://techtutorialsx.com/2019/04/13/python-opencv-converting-image-to-black-and-white/
@@ -58,6 +61,61 @@ def createDb():
     sql_conn.commit()
     # closing connection
     sql_conn.close()
+
+def sendToDb(text):
+    print(f'sending to Mongo {text}')
+
+    url = "http://localhost:8002/testArkData"
+    parameters = {
+        'cat:': text}
+
+    r = requests.post(url, params=parameters)
+
+    # splits each entry to day
+    text = text.lower()
+    text = text.split("day")
+
+    jsonArray = []
+
+    categories = ['destro', 'illed', 'starved', 'tamed', 'added', 'froze']
+    defaultCat = ""
+    for x in text:
+        jsonString = {}
+        n = 3
+        groups = x.split(':')
+        datasplit = ':'.join(groups[:n]), ':'.join(groups[n:])
+
+        # date should only be 16 length ie. ' 10095, 19:21:48' and msg should be greater than 5
+        if len(datasplit) >= 2:
+            date = datasplit[0]
+            entry = datasplit[1]
+
+
+        # print(f'date is {len(date)} {date} and entry is {len(entry)} : {entry}')
+        if len(date) != 16 or len(entry) < 5:
+            continue
+
+        for cat in categories:
+            if cat in entry:
+                defaultCat = cat
+
+        if len(defaultCat) == 0:
+            defaultCat = "misc"
+
+        #add each entry to the json dic
+
+        jsonString["InGameDate"] = date
+        jsonString["Msg"] = entry
+        jsonString["Cat"] = defaultCat
+        jsonString["TimeStamp"] = datetime.now().isoformat()
+        jsonArray.append(jsonString)
+
+    data_json = json.dumps(jsonArray)
+    payload = {'ArkMsg': data_json}
+    r = requests.post(url, data=payload)
+    print(data_json)
+    print(r)
+    print('finished')
 
 
 def saveData(text):
@@ -196,7 +254,8 @@ def tribeLogLogging(data):
     text = str(pytesseract.image_to_string(image))
 
     # print(text)
-    saveData(text)
+    #saveData(text)
+    sendToDb(text)
 
 
 def changeTribeLogLoc(data):

@@ -109,15 +109,15 @@ async def on_message(message):
 
 #dataTest.start()
 
-url = "http://localhost:8000/users"
+url = "http://localhost:8002/test"
 parameters = {
-    'cat:': '\'froze\', \'destroyed\''}
-r = requests.post(url, params=parameters)
+    'cat:': 'froze'}
+r = requests.get(url, params=parameters)
 jsonObject = r.json()
 # print the keys and values
-
-for x in jsonObject:
-    print(x)
+print(jsonObject)
+# for x in jsonObject:
+#     print(x)
 
 
 

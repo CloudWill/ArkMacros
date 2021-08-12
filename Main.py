@@ -49,6 +49,7 @@ def run_option(data, option):
         OCR.TribeLogsOcr.saveTribeLogLoc(data)
     elif option == "11":
         OCR.TribeLogsOcr.tribeLogLogging(data)
+        exit(1)
     elif option == "12":
 
         keyboard.hook(exit_on_key(data["escapeKey"]))
@@ -69,6 +70,8 @@ data = SetupFiles.Config.set_settings()
 
 # to see if it's user run or script run
 n = len(sys.argv)
+run_option(data, "11")
+exit(1)
 if n == 1:
     var = "-1"
     while var != "0":
@@ -83,6 +86,7 @@ if n == 1:
                     f" 8 - Start Staying Alive\"e\"\n"
                     f" 0 - exit \n ")
         run_option(data, var)
+        run_option(data, 11)
 
     # run explict option
 else:

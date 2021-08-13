@@ -44,18 +44,16 @@ def run_option(data, option):
     elif option == "8":
         OCR.StayingAlive.start_staying_alive(data)
     elif option == "9":
-        OCR.TribeLogsOcr.changeTribeLogLoc(data)
+        OCR.TribeLogsOcr.ChangeTribeLogLoc(data)
     elif option == "10":
-        OCR.TribeLogsOcr.saveTribeLogLoc(data)
+        OCR.TribeLogsOcr.SaveSSTribeLog(data)
     elif option == "11":
-        OCR.TribeLogsOcr.tribeLogLogging(data)
-        exit(1)
+        OCR.TribeLogsOcr.TribeLogLogging(data)
     elif option == "12":
-
         keyboard.hook(exit_on_key(data["escapeKey"]))
         while True:
-            OCR.TribeLogsOcr.saveTribeLogLoc(data)
-            OCR.TribeLogsOcr.tribeLogLogging(data)
+            OCR.TribeLogsOcr.SaveSSTribeLog(data)
+            OCR.TribeLogsOcr.TribeLogLogging(data)
             time.sleep(15)
     elif option == "99":
         os._exit(1)
@@ -65,16 +63,21 @@ def run_option(data, option):
         print("Invalid input. Please try again")
     print(f"\n\n* * * done * * * \n\n")
 
-#gets the data
-data = SetupFiles.Config.set_settings()
+
 
 # to see if it's user run or script run
 n = len(sys.argv)
+data = SetupFiles.Config.set_settings()
+
 run_option(data, "11")
-exit(1)
+exit(0)
 if n == 1:
+
     var = "-1"
     while var != "0":
+        # reloads the data
+        data = SetupFiles.Config.set_settings()
+        #user input
         var = input(f"Please enter a number and press the enter key: (esc key to exit program)\n"
                     f" 1 - Start the auto-clicker \n"
                     f" 2 - Start the autoMoveForward\n"
@@ -86,7 +89,6 @@ if n == 1:
                     f" 8 - Start Staying Alive\"e\"\n"
                     f" 0 - exit \n ")
         run_option(data, var)
-        run_option(data, 11)
 
     # run explict option
 else:

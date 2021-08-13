@@ -13,4 +13,7 @@ Backend/Mongo/err.log
 Backend/Mongo/combined.log
 Backend/Mongo/package-lock.json
 Backend/Mongo/node_modules
-Backend/OCR/Images
+Backend/Mongo/OCR/Images
+OCR/Images - Copy
+Backend/Mongo/out.log
+Backend/Mongo/err.log

@@ -1,4 +1,6 @@
 import os
+import time
+
 import discord
 from dotenv import load_dotenv
 import random
@@ -109,13 +111,39 @@ async def on_message(message):
 
 #dataTest.start()
 
-url = "http://localhost:8002/test"
+url = "http://localhost:8005/ArkLogsTest"
 parameters = {
-    'cat:': 'froze'}
-r = requests.get(url, params=parameters)
-jsonObject = r.json()
-# print the keys and values
-print(jsonObject)
+    'froze', 'whatever', 'hihi'}
+
+jsonArray = []
+
+for x in parameters:
+    jsonString = {}
+    jsonString["MsgCategory"] = x
+    jsonArray.append(jsonString)
+
+data_json = json.dumps(jsonArray)
+
+payload = {'MsgCategories': data_json}
+
+#see if it is successfull before changing values
+
+r = requests.get(url, data=payload)
+#wait x seconds for a response
+maxWait = 10
+currentWait = 0
+
+if r.status_code == 200:
+    print(r)
+    jsonObject = r.json()
+    # print the keys and values
+    print(len(jsonObject))
+    print(jsonObject)
+    url =  "http://localhost:8005/UpdateQueryTest"
+    r = requests.put(url, data=payload)
+else:
+    print('err')
+
 # for x in jsonObject:
 #     print(x)
 

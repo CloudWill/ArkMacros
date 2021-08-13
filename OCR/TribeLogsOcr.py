@@ -65,7 +65,7 @@ def createDb():
 def sendToDb(text):
     print(f'sending to Mongo {text}')
 
-    url = "http://localhost:8002/testArkData"
+    url = "http://localhost:8005/ArkLogs"
     parameters = {
         'cat:': text}
 
@@ -107,6 +107,7 @@ def sendToDb(text):
         jsonString["InGameDate"] = date
         jsonString["Msg"] = entry
         jsonString["Cat"] = defaultCat
+        jsonString["DiscordRead"] = 0
         jsonString["TimeStamp"] = datetime.now().isoformat()
         jsonArray.append(jsonString)
 
@@ -212,17 +213,26 @@ def addText(text):
 
 def tribeLogLogging(data):
     print('processing image')
-    # time.sleep(data['delayBeforeStarting'])
-    # pyautogui.press('l')
-    # time.sleep(1)
-    # pyautogui.press('l')
-
+    #
+    # import requests
+    url = 'http://localhost:8005/DataProcessing'
+    folder_path = f'{data["programLoc"]}\\{data["tribeLogLoc"]}'
+    file_type = '\*png'
+    files = glob.glob(folder_path + file_type)
+    image_loc = max(files, key=os.path.getctime)
+    #
+    files = {'media': open(image_loc, 'rb')}
+    print(files)
+    requests.post(url, files=files)
+    exit(0)
     pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
 
     folder_path = f'{data["programLoc"]}\\{data["tribeLogLoc"]}'
     file_type = '\*png'
     files = glob.glob(folder_path + file_type)
     image_loc = max(files, key=os.path.getctime)
+
+
 
     # print(f'Image loc is: {image_loc}')
 
@@ -255,7 +265,8 @@ def tribeLogLogging(data):
 
     # print(text)
     #saveData(text)
-    sendToDb(text)
+    #sendToDb(text)
+
 
 
 def changeTribeLogLoc(data):

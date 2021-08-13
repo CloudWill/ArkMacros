@@ -43,9 +43,9 @@ body {
   grid-area: delete-quotes;
 }
 
-[data-position="quotes"] {
-  grid-area: quotes;
-  overflow: scroll;
+[data-position="logs"] {
+    grid-area: quotes;
+    overflow: scroll;
 }
 
 [data-position] {

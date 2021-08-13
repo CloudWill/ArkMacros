@@ -1,17 +1,19 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const MongoClient = require('mongodb').MongoClient
+const { MongoClient, Logger } = require("mongodb")
 const app = express()
 
-//reads from .env
-const dotenv = require('dotenv');
-dotenv.config();
+// Updates environment variables
+require('./dotenv')
 //connection string
 const connectionString = process.env.DB_URL
+
 
 MongoClient.connect(connectionString, { useUnifiedTopology: true })
     .then(client => {
         console.log('Connected to Database')
+
+
         const db = client.db(process.env.DBNAME)
         const quotesCollection = db.collection(process.env.DBCOLLECTION)
 
@@ -22,14 +24,18 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
         app.use(bodyParser.urlencoded({ extended: true }))
         app.use(bodyParser.json())
         app.use(express.static('public'))
+        //make the uploaded files publicly accessible from anywhere, just make the uploads directory static:
+        app.use(express.static('uploads'));
+
+
 
         // ========================
         // Routes
         // ========================
         app.get('/', (req, res) => {
-            db.collection('quotes').find().toArray()
-                .then(quotes => {
-                    res.render('index.ejs', { quotes: quotes })
+            quotesCollection.find().toArray()
+                .then(msg => {
+                    res.render('index.ejs', { InGameDate: msg, Msg: msg })
                 })
                 .catch(/* ... */)
         })
@@ -60,17 +66,6 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
                             console.log('Error');
                     });
                 }
-
-                //quotesCollection.updateMany(
-                //    { "Cat": { $eq: "froze" } },
-                //    {
-                //        $set: { "DiscordRead": 1,},
-                //        $currentDate: { lastModified: true }
-                //    }
-                //)
-
-
-
             }
             catch (err) {
                 console.error(err)
@@ -78,23 +73,68 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
             return res.send('Success');
         });
 
-        app.get('/ArkLogs', (req, res) => {
-            ////finds all [ in categoriy]
-            filter = {
-                "Cat": { $all: ["killed"] }
-            };
-            console.log(quotesCollection.find(filter).getCollection(process.env.DBCOLLECTION));
-             return res.send(quotesCollection.find(filter).getCollection(process.env.DBCOLLECTION));
+        app.get('/ArkLogsTest', (req, res) => {
+
+            //gets the categories required
+            json = req.body
+
+            //gets all the tribe messages
+            try {
+                formatted = JSON.parse(json.MsgCategories)
+                //add the cateogies to an array
+                let items = [];
+                for (var key in formatted) {
+                    let cat = formatted[key].MsgCategory
+                    //console.log(cat);
+                    items.push(cat);
+                }
+
+                //creates the filter object
+                filter = { Cat: { $in: items } }
+                quotesCollection.find(filter).toArray(function (err, data) {
+                    res.send(data);
+                });
+
+            }
+            catch (err) {
+                console.error(err)
+            }
+            // return res.send('hi');
         });
 
+        app.put('/UpdateDiscordRead', (req, res) => {
+            //gets all the tribe messages
+            try {
+                formatted = JSON.parse(json.MsgCategories)
+                //add the cateogies to an array
+                let items = [];
+                for (var key in formatted) {
+                    let cat = formatted[key].MsgCategory
+                    //console.log(cat);
+                    items.push(cat);
+                }
 
-        app.post('/quotes', (req, res) => {
-            quotesCollection.insertOne(req.body)
-                .then(result => {
-                    res.redirect('/')
-                })
-                .catch(error => console.error(error))
+                //creates the filter object
+                filter = { Cat: { $in: items } }
+
+ 
+                quotesCollection.updateMany(filter,
+                    {
+                        $set: { "DiscordRead": 1},
+                        $currentDate: { lastModified: true }
+                    })
+
+            }
+            catch (err) {
+                console.error(err)
+            }
+            return res.send('hi');
+          
         })
+
+
+
+
 
         app.put('/quotes', (req, res) => {
             quotesCollection.findOneAndUpdate(

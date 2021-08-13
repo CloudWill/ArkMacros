@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ark App</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+
+  <body>
+    <h1 data-position="header">Ark - Tribe Logs for Valgaro</h1>    
+
+    <section data-position="logs">
+      <h2>Logs</h2>
+
+      <ul class="logs">
+        <% for(var i = 0; i < Msg.length; i++) {%>
+        <li class="logs">
+          <span><%= InGameDate[i].InGameDate %></span>:
+          <span><%= Msg[i].Msg %></span>
+        </li>
+        <% } %>
+      </ul>
+    </section>
+
+    <script src="/main.js"></script>
+  </body>
+</html>

@@ -17,14 +17,14 @@ goto :install
 		echo.
 		echo.
 		::reset to default settings. Then change the default position for the autoclicker to drop
-		python SetupFiles\Main.py 4
-		python SetupFiles\Main.py 3
+		python Main.py 4
+		python Main.py 3
 		goto :endofscript
 	)
 
 :next
 	(
-		python SetupFiles\Main.py 
+		python Main.py 
 	)
 
 

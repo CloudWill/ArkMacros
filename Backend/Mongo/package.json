@@ -1,0 +1,27 @@
+{
+  "name": "ArkApp",
+  "version": "1.0.0",
+  "description": "Bored developer that didn't like the manual aspect of Ark",
+  "main": "index.js",
+  "scripts": {
+    "start": "node pm2.js",
+    "restart": "node pm2.js ArkWebServer --update-env",
+    "dev": "nodemon server.js",
+    "sync": "node sync.js"
+  },
+  "author": "Willy Sin",
+  "license": "",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.6.0",
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "mongodb": "^4.1.0",
+    "pm2": "^4.5.6"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12",
+    "rsync": "^0.6.1"
+  }
+}

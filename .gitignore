@@ -1,6 +1,19 @@
 SetupFiles/__pycache__/
 __pycache__/
 .idea/
-Server/.vs
-Server/ark-macro/ark-macros/.vs
-Server/ark-macro/ark-macros/node_modules
+OCR/Images
+OCR/.env
+Backend/package-lock.json	
+OCR/Images/JPEG
+Backend/Mongo/.env
+Backend/Mongo/.gitignore
+Backend/Mongo/.vs
+Backend/Mongo/out.log
+Backend/Mongo/err.log
+Backend/Mongo/combined.log
+Backend/Mongo/package-lock.json
+Backend/Mongo/node_modules
+Backend/Mongo/OCR/Images
+OCR/Images - Copy
+Backend/Mongo/out.log
+Backend/Mongo/err.log

@@ -3,6 +3,7 @@ import subprocess
 import json
 
 
+
 def create_ahk_file(data):
     f = open(data["programLoc"] +"\\" + data["requiredFilesLoc"] + "\\AutoHotKeysSettings.ahk", "w")
     # .ahk file for autohotkey

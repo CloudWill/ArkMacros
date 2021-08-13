@@ -1,1 +1,1 @@
-python.exe "D:\OneDrive\Sorted\Programming\Python\Ark Farming\SetupFiles\Main.py" 6
+python.exe "D:\OneDrive\Sorted\Programming\Python\Ark Farming\Main.py" 6

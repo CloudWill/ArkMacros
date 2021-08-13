@@ -69,8 +69,6 @@ def run_option(data, option):
 n = len(sys.argv)
 data = SetupFiles.Config.set_settings()
 
-run_option(data, "11")
-exit(0)
 if n == 1:
 
     var = "-1"

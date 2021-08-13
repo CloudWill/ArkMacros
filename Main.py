@@ -54,7 +54,7 @@ def run_option(data, option):
         while True:
             OCR.TribeLogsOcr.SaveSSTribeLog(data)
             OCR.TribeLogsOcr.TribeLogLogging(data)
-            time.sleep(15)
+            time.sleep(90)
     elif option == "99":
         os._exit(1)
     elif option == "0":

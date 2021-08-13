@@ -21,7 +21,7 @@ async def RunTribeLogAlert():
 
     url = os.getenv('URL_TRIBE_MSG_LOG')
     parameters = {
-        'killed', 'destroyed'}
+        'killed', 'destroyed', 'starved'}
     jsonArray = []
     for x in parameters:
         jsonString = {}

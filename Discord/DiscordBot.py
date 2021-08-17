@@ -5,9 +5,23 @@ from dotenv import load_dotenv
 from discord.ext import tasks, commands
 import json
 import requests
-import time
+
 def Logging(msg):
     print(f'{datetime.datetime.now()} : {msg}')
+
+
+def RunPlayerWarningValg(playerCount):
+    url = 'https://api.battlemetrics.com/servers/7256984'
+    playerCount = 0
+    r = requests.get(url)
+    jsonObject = r.json()
+    data = jsonObject["data"]
+    playerCount = int(data['attributes']["players"])
+    server = data['attributes']["details"]["map"]
+    print(f'PlayerAlert {server} ||| There are {playerCount}')
+
+
+
 
 @tasks.loop(seconds = 90) # repeat after every x seconds
 async def RunTribeLogAlert():
@@ -56,6 +70,7 @@ load_dotenv()
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 client = discord.Client()
+
 
 RunTribeLogAlert.start()
 

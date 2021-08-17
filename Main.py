@@ -12,7 +12,10 @@ import SetupFiles.AutoE
 import OCR.StayingAlive
 import OCR.TribeLogsOcr
 import time
+import datetime
 
+def logging(msg):
+    print(f'{datetime.datetime.now()}: {msg}')
 #exits program
 def exit_on_key(keyname):
     """ Create callback function that exits current process when the key with
@@ -52,6 +55,7 @@ def run_option(data, option):
     elif option == "12":
         keyboard.hook(exit_on_key(data["escapeKey"]))
         while True:
+            logging("starting")
             OCR.TribeLogsOcr.SaveSSTribeLog(data)
             OCR.TribeLogsOcr.TribeLogLogging(data)
             time.sleep(90)

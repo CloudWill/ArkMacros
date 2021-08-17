@@ -2,7 +2,7 @@ SetupFiles/__pycache__/
 __pycache__/
 .idea/
 OCR/Images
-OCR/.env
+Discord/.env
 Backend/package-lock.json	
 OCR/Images/JPEG
 Backend/Mongo/.env

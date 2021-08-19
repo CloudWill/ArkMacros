@@ -7,7 +7,7 @@ from commands.GetPlayerCount import GetPlayerCount
 from utility import Log
 from commands.Alerts import Alerts
 
-load_dotenv('test.env')
+load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN_TEST')
 
 guild_id = os.getenv('DISCORD_GUILD')
@@ -41,7 +41,7 @@ async def player_count(ctx):
 async def raid_alert():
     await bot.wait_until_ready()  # Make sure your guild cache is ready so the channel can be found via get_channel
     #gets the variables required
-    load_dotenv('test.env')
+    load_dotenv()
     channel_id = os.getenv('DISCORD_TRIBE_MSG_CHANNEL_ID')
     channel = bot.get_channel(int(channel_id))
     server_id = os.getenv('SERVER_ALERT')

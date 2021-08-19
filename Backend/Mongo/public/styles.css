@@ -16,8 +16,8 @@ body {
   grid-template-rows: auto auto 2fr;
   grid-template-areas:
     "header header header"
-    "add-quotes update-quote delete-quote"
-    "quotes quotes quotes";
+    "add add add"
+    "logs logs logs";
   gap: 1rem;
   margin: 0;
   padding: 1rem;
@@ -31,20 +31,13 @@ body {
   grid-area: header;
 }
 
-[data-position="add-quotes"] {
-  grid-area: add-quotes;
+[data-position="add"] {
+  grid-area: add;
 }
 
-[data-position="update-quotes"] {
-  grid-area: update-quotes;
-}
-
-[data-position="delete-quotes"] {
-  grid-area: delete-quotes;
-}
 
 [data-position="logs"] {
-    grid-area: quotes;
+    grid-area: logs;
     overflow: scroll;
 }
 

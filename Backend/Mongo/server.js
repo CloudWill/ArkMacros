@@ -19,7 +19,9 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
 
         const db = client.db(process.env.DBNAME)
         const arkTribeLogs = db.collection(process.env.DBCOLLECTION)
-
+        const arkFriendlys = db.collection(process.env.DBFRIENDLYCOLLECTION)
+        const arkEnemies = db.collection(process.env.DBENEMYCOLLECTION)
+        const arkServers = db.collection(process.env.DBESERVERCOLLECTION)
         // ========================
         // Middlewares
         // ========================
@@ -27,6 +29,7 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
         app.use(bodyParser.urlencoded({ extended: true }))
         app.use(bodyParser.json())
         app.use(express.static('public'))
+
 
         // ========================
         // Routes
@@ -37,6 +40,109 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
                     res.render('index.ejs', { InGameDate: msg, Msg: msg })
                 })
                 .catch(/* ... */)
+        })
+
+        app.get('/Allies', (req, res) => {
+            arkFriendlys.find().toArray()
+                .then(msg => {
+                    res.render('allies.ejs', { steam_name: msg, ign: msg, battlemetrics_id: msg, notes: msg })
+                })
+                .catch(/* ... */)
+        })
+        app.get('/AlliesApi', (req, res) => {
+            arkFriendlys.find().toArray()
+                .then(msg => {
+                    res.send(msg)
+                })
+                .catch(/* ... */)
+        })
+
+        app.post('/AddAllies', (req, res) => {
+            arkFriendlys.insertOne(req.body)
+                .then(result => {
+                    res.redirect('/Allies')
+                })
+                .catch(error => console.error(error))
+        })
+
+        app.post('/DeleteAllies', (req, res) => {
+            arkFriendlys.deleteOne(
+                { steam_name: req.body.steam_name }
+            )
+                .then(result => {
+                    res.redirect('/Allies')
+                })
+                .catch(error => console.error(error))
+        })
+
+        app.get('/Enemies', (req, res) => {
+            arkEnemies.find().toArray()
+                .then(msg => {
+                    res.render('enemies.ejs', { steam_name: msg, ign:msg, battlemetrics_id: msg, notes: msg })
+                })
+                .catch(/* ... */)
+        })
+
+        app.get('/EnemiesApi', (req, res) => {
+            arkEnemies.find().toArray()
+                .then(msg => {
+                    res.send(msg)
+                })
+                .catch(/* ... */)
+        })
+
+        app.post('/AddEnemies', (req, res) => {
+            arkEnemies.insertOne(req.body)
+                .then(result => {
+                    res.redirect('/Enemies')
+                })
+                .catch(error => console.error(error))
+        })
+
+        app.post('/DeleteEnemies', (req, res) => {
+            arkEnemies.deleteOne(
+                { steam_name: req.body.steam_name }
+            )
+                .then(result => {
+                    res.redirect('/Enemies')
+                })
+                .catch(error => console.error(error))
+        })
+
+        app.get('/Servers', (req, res) => {
+            arkServers.find().toArray()
+                .then(msg => {
+                    res.render('servers.ejs', { server_name: msg, server_id: msg})
+                })
+                .catch(/* ... */)
+        })
+
+        app.get('/ServersApi', (req, res) => {
+            arkServers.find().toArray()
+                .then(msg => {
+                    res.send(msg)
+                })
+                .catch(/* ... */)
+        })
+
+        app.post('/AddServers', (req, res) => {
+            console.log(req.body)
+            arkServers.insertOne(req.body)
+                .then(result => {
+                    res.redirect('/Servers')
+                })
+                .catch(error => console.error(error))
+        })
+
+        app.post('/DeleteServers', (req, res) => {
+            console.log(req.body)
+            arkServers.deleteOne(
+                { server_name: req.body.server_name }
+            )
+                .then(result => {
+                    res.redirect('/Servers')
+                })
+                .catch(error => console.error(error))
         })
 
         app.post('/InsertArkTribeLogs', async (req, res) => {
@@ -149,7 +255,7 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
                             $currentDate: { lastModified: true }
                         })
                 }
-                
+
 
             }
             catch (err) {

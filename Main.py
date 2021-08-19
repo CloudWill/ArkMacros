@@ -61,6 +61,8 @@ def run_option(data, option):
             time.sleep(90)
     elif option == "99":
         os._exit(1)
+    elif option == "13":
+        SetupFiles.AutoClickerDrop.auto_click(data)
     elif option == "0":
         print("Exiting")
     else:

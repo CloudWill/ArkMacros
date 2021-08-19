@@ -39,6 +39,17 @@ def auto_click_drop(data):
             pyautogui.click()
         pyautogui.press('f')
 
+
+def auto_click(data):
+    # exits the program if the esc key is detected
+    keyboard.hook(exit_on_key(data["escapeKey"]))
+
+    time.sleep(data['delayBeforeStarting'])
+
+    while True:
+        pyautogui.click()
+
+
 def change_mouse_pos_auto_click_drop(data):
     input("Press Enter after positioning mouse cursor in the \"Other\" search bar")
     otherInvSearchX, otherInvSearchY = pyautogui.position()

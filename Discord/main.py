@@ -4,7 +4,6 @@ from discord.ext import commands
 from discord.ext import tasks
 from dotenv import load_dotenv
 from commands.GetPlayerCount import GetPlayerCount
-from utility import Log
 from commands.Alerts import Alerts
 
 load_dotenv()
@@ -57,8 +56,6 @@ async def raid_alert():
     if potential_raid:
         await channel.send(f"Looks like there might be {potential_raid} non-allies currently online in Valguero")
     enemies_online = alerts.get_alert_enemy_on()
-    leng = len(enemies_online)
-    print(f'{enemies_online} length {leng}')
     if len(enemies_online) > 4:
         await channel.send(f"{enemies_online}")
 

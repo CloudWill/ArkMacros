@@ -1,4 +1,4 @@
-from utility.Log import discord_log
+from Log import discord_log
 import requests
 import os
 from dotenv import load_dotenv
@@ -6,7 +6,7 @@ import json
 
 class GetPlayerCount():
     def __init__(self):
-        load_dotenv('test.env')
+        load_dotenv()
 
     # gets the player count for a server
     def get_player_count(self, serverid):

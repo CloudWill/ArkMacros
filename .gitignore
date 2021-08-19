@@ -17,3 +17,7 @@ Backend/Mongo/OCR/Images
 OCR/Images - Copy
 Backend/Mongo/out.log
 Backend/Mongo/err.log
+Discord/DiscordBotLog.txt
+Discord/commands/DiscordBotLog.txt
+Discord/test.env
+Discord/commands/test.env

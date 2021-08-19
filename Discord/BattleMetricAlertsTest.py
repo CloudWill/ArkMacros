@@ -34,7 +34,7 @@ async def get_player_count(serverid):
     server = data['attributes']['details']['map']
     returReq = f'\nThere are {playerCount} people online in {server}'
     debug_log(f'{returReq}')
-    return returReq
+    return playerCount
 
 
 def get_help(serverFilters):
@@ -72,7 +72,8 @@ async def on_message(message):
                         # see if key exists
                         if x in servers:
                             debug_log(x)
-                            resp = await get_player_count(servers[x])
+                            count = await get_player_count(servers[x])
+                            f'\nThere are {count} people online in {x}'
                             total_player_count.append(resp)
                         else:
                             resp = f'Your input of {x} was invalid for !playercount. Please try again or get help with !help'

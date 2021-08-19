@@ -13,7 +13,10 @@ channelId = os.getenv('DISCORD_TRIBE_MSG_CHANNEL_ID_TEST')
 channel = client.get_channel(int(channelId))
 
 def debug_log(msg):
-    print(f'{datetime.datetime.now()}: {msg}')
+    f = open("DiscordBotLog.txt", "a")
+    f.write(f'{datetime.datetime.now()}: DEBUG: {msg}\n')
+    f.close()
+    print(f'{datetime.datetime.now()}: DEBUG: {msg}\n')
 
 @client.event
 async def on_ready():

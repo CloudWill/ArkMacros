@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ark App</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+
+  <body>
+    <h1 data-position="header">Ark - Adds Allies</h1>
+
+    <section data-position="add">
+      <h2>Add Allies</h2>
+
+      <form action="/AddAllies" method="POST">
+        <input type="text" placeholder="steam_name" name="steam_name" />
+        <input type="text" placeholder="ign" name="ign" />
+        <input type="text" placeholder="battlemetrics_id" name="battlemetrics_id" />
+        <input type="text" placeholder="notes" name="notes" />
+
+        <button type="submit">Submit</button>
+      </form>
+    </section>
+
+    <h1 data-position="header">Ark - Add Allies</h1>
+
+    <section data-position="logs">
+      <h2>Allies</h2>
+
+      <ul class="logs">            
+      <table class="logs">
+                <tr>
+                <th>Steam Name</th>
+                <th>ign</th>
+                <th>Battle Metrics Id </th>
+                <th>Notes </th>
+                </tr>
+                
+            <% for(var i = 0; i < steam_name.length; i++) {%>
+                <tr>
+                  <th><%= steam_name[i].steam_name %></th>
+                  <th><%= ign[i].ign %></th>
+                 <th><%= battlemetrics_id[i].battlemetrics_id %></th>
+                 <th><%= notes[i].notes %></th>
+                     <form method="POST" action="/DeleteAllies">
+                        <th><button type="submit" name=steam_name  value='<%= steam_name[i].steam_name%>'> Delete <%= steam_name[i].steam_name%></button></th>
+                    </form>
+                </tr>
+            <% } %>
+           </table>
+      </ul>
+    </section>
+
+    <script src="/main.js"></script>
+  </body>
+</html>

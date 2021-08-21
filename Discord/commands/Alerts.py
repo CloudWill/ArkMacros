@@ -64,8 +64,9 @@ class Alerts():
                     msg = f'{ign} is currently online at {server_name} --- Notes: {notes}\n'
                     msgs.append(msg)
             elif r.status_code == 429:
-                msg = f'Limit exceeded. Please try again in 2 minutes'
+                msg = f'Limit exceeded. Please try again in 2 minutes\n'
                 msgs.append(msg)
+                break
             else:
                 discord_log(f'{steam_name} | api {url} gave the response {r}\n {r.json()}')
         return msgs

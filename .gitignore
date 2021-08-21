@@ -25,8 +25,5 @@ __pycache__/
 /Discord/commands/test.env
 /Macros/*.bat
 /Macros/SetupFiles/*.bat
-
-/Discord/*.env
 /Macros/OCR/Images
 /Macros/OCR/Images - Copy
-/Discord/test.env

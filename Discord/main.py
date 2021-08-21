@@ -15,8 +15,7 @@ guild_id = os.getenv('DISCORD_GUILD')
 channel_id = os.getenv('DISCORD_TRIBE_MSG_CHANNEL_ID')
 
 bot = commands.Bot(command_prefix='!')
-
-@bot.command(name='playercount', help = '''gets the current players on a server according to battle metrics\n' \
+@bot.command(name='playercount', help = '''sends a message about the total players in a server\n' \
 [filter] can be a specific server(s) or it can can have the flag [all] to get all the people for all servers.\n'\
 The current servers are [Valguero, TheCenter, ScorchedEarth, CrystalIsles, Aberration, Extinction, Ragnarok, Genone, TheIsland, GenTwo]''')
 async def player_count(ctx, value):
@@ -38,7 +37,7 @@ async def player_count(ctx):
 async def player_count(ctx):
     await ctx.send('<https://www.youtube.com/watch?v=dQw4w9WgXcQ>')
 
-@bot.command(name='alert', help = '''alerts the tribe how many non-friendly members or "123" are on a give server \n' \
+@bot.command(name='alert', help = '''gives a message about how many non-friendly members or "123" are on a given server \n' \
 [filter] has to be a specific server\n'\
 The current servers are [Valguero, TheCenter, ScorchedEarth, CrystalIsles, Aberration, Extinction, Ragnarok, Genone, TheIsland, GenTwo]''')
 async def alert_discord(ctx, val):
@@ -67,15 +66,14 @@ async def alert_discord(ctx, val):
 
             #sends the non-friendlys count msg
             non_allies = alerts.non_allies_online_count(url_allies, server_name, server_id, online_players)
-            msg =  f"Looks like there are {online_players} online and {non_allies} of them are non-allies or '123' currently online in {server_name}"
+            msg = f"{server_name} | {online_players} total online players. {non_allies} of them are either non-allies or '123'"
 
-            await ctx.send(f"Looks like there are {non_allies} non-allies or '123' currently online in {server_name}")
             # see if enemy is only at a specific server
             enemies_online = alerts.get_online_info(url_enemies, server_name, server_id)
             if len(enemies_online) > 4:
                 msg = f'{msg}\n{enemies_online}'
             val_found = True
-            ctx.send(f"{msg}")
+            await ctx.send(f"{msg}")
             break
     if not val_found:
         ctx.send(f'Your input [{val}] was invalid for !alert. Please try again or get help with !help')
@@ -99,12 +97,12 @@ async def raid_alert_valg(server_name, server_id, alert_threshold):
     non_allies = alerts.non_allies_online_count(url_allies, server_name, server_id, online_players)
     msg = ""
     if non_allies > alert_threshold:
-        online_msg = f"Looks like there are {online_players} online and {non_allies} of them are non-allies or '123' currently online in {server_name}"
+        online_msg = f"{server_name} | {online_players} total online players. {non_allies} of them are either non-allies or '123'"
         msg = f'{msg}{online_msg}\n'
     #see if enemy is only at a specific server
     enemies_online = alerts.get_online_info(url_enemies, server_name, server_id)
     if len(enemies_online) > 4:
-        enemies_online = f'{msg} {online_msg}\n'
+        msg = f'{msg} {online_msg}\n'
     if len(msg) >0:
         await channel.send(msg)
 

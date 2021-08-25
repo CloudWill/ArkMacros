@@ -5,20 +5,9 @@ __pycache__/
 /Discord/.env
 /Discord/test.env
 /Discord/dev.env
-/Backend/package-lock.json	
 /OCR/Images/JPEG
-/Backend/Mongo/.env
-/Backend/Mongo/.gitignore
-/Backend/Mongo/.vs
-/Backend/Mongo/out.log
-/Backend/Mongo/err.log
-/Backend/Mongo/combined.log
-/Backend/Mongo/package-lock.json
-/Backend/Mongo/node_modules
-/Backend/Mongo/OCR/Images
+/Backend/OCR/Images
 /OCR/Images - Copy
-/Backend/Mongo/out.log
-/Backend/Mongo/err.log
 /Discord/DiscordBotLog.txt
 /Discord/commands/DiscordBotLog.txt
 /Discord/test.env
@@ -27,3 +16,8 @@ __pycache__/
 /Macros/SetupFiles/*.bat
 /Macros/OCR/Images
 /Macros/OCR/Images - Copy
+Macros/OCR/Test Images
+Server/.env
+Server/.vs
+Server/OCR/Images
+Server/node_modules

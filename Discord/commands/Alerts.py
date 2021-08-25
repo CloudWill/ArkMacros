@@ -66,7 +66,7 @@ class Alerts():
             elif r.status_code == 429:
                 msg = f'Limit exceeded. Please try again in 2 minutes\n'
                 msgs.append(msg)
-                break
+                return msgs
             else:
                 discord_log(f'{steam_name} | api {url} gave the response {r}\n {r.json()}')
         return msgs

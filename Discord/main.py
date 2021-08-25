@@ -18,9 +18,10 @@ bot = commands.Bot(command_prefix='!')
 @bot.command(name='playercount', help = '''sends a message about the total players in a server\n' \
 [filter] can be a specific server(s) or it can can have the flag [all] to get all the people for all servers.\n'\
 The current servers are [Valguero, TheCenter, ScorchedEarth, CrystalIsles, Aberration, Extinction, Ragnarok, Genone, TheIsland, GenTwo]''')
-async def player_count(ctx, value):
+async def player_count(ctx, val):
+    val = val.lower()
     player_count = GetPlayerCount()
-    msg = player_count.parse_message(value)
+    msg = player_count.parse_message(val)
     await ctx.send(msg)
 
 @bot.command(name='allies', help = '''The list of the current allies that's not named '123' that we don't need to track''')
@@ -41,6 +42,7 @@ async def player_count(ctx):
 [filter] has to be a specific server\n'\
 The current servers are [Valguero, TheCenter, ScorchedEarth, CrystalIsles, Aberration, Extinction, Ragnarok, Genone, TheIsland, GenTwo]''')
 async def alert_discord(ctx, val):
+    val = val.lower()
     # servers to track
     load_dotenv()
     server_url = os.getenv('SERVERS_API')
@@ -48,12 +50,10 @@ async def alert_discord(ctx, val):
     url_enemies = os.getenv('ENEMY_MEMBERS_API')
 
     alerts = Alerts()
-
+    val = val.lower()
     r = requests.get(server_url)
     servers = r.json()
     val_found = False
-
-
 
     #finds the server to query
     for x in servers:
@@ -72,13 +72,15 @@ async def alert_discord(ctx, val):
             enemies_online = alerts.get_online_info(url_enemies, server_name, server_id)
             if len(enemies_online) > 4:
                 msg = f'{msg}\n{enemies_online}'
+            else:
+                msg = f'{msg}\n | There are no known enemies online on this server'
             val_found = True
             await ctx.send(f"{msg}")
             break
     if not val_found:
-        ctx.send(f'Your input [{val}] was invalid for !alert. Please try again or get help with !help')
+        await ctx.send(f'Your input [{val}] was invalid for !alert. Please try again or get help with !help')
 
-@tasks.loop(minutes=45)
+@tasks.loop(minutes=60)
 async def raid_alert_valg(server_name, server_id, alert_threshold):
     await bot.wait_until_ready()
     load_dotenv()
@@ -97,13 +99,13 @@ async def raid_alert_valg(server_name, server_id, alert_threshold):
     non_allies = alerts.non_allies_online_count(url_allies, server_name, server_id, online_players)
     msg = ""
     if non_allies > alert_threshold:
-        online_msg = f"{server_name} | {online_players} total online players. {non_allies} of them are either non-allies or '123'"
+        online_msg = f"Auto message | {server_name} | {online_players} total online players. {non_allies} of them are either non-allies or '123'"
         msg = f'{msg}{online_msg}\n'
     #see if enemy is only at a specific server
     enemies_online = alerts.get_online_info(url_enemies, server_name, server_id)
     if len(enemies_online) > 4:
-        msg = f'{msg} {online_msg}\n'
-    if len(msg) >0:
+        msg = f'{msg} {enemies_online}\n'
+    if len(msg) > 0:
         await channel.send(msg)
 
 # sends an auto message if more than x people are online based on thresold

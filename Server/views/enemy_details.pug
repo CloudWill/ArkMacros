@@ -1,0 +1,14 @@
+extends layout
+
+block content
+
+  h1 Enemy: #{enemy.name}
+   
+  div(style='margin-left:20px;margin-top:20px')
+
+      
+  hr
+  p
+    a(href=enemy.url+'/delete') Delete Enemy
+  p
+    a(href=enemy.url+'/update') Update Enemy

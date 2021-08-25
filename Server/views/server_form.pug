@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  h1=title
+
+  form(method='POST' action='')
+    div.form-group
+      label(for='server_name') Server Name:
+      input#server_name.form-control(type='text', placeholder='Server Name' name='server_name' required='true' value=(undefined===server ? '' : server.server_name) )
+      label(for='server_id') Server Id:
+      input#server_id.form-control(type='text', placeholder='Server Id' name='server_id' value=(undefined===server ? '' : server.server_id))
+    button.btn.btn-primary(type='submit') Submit
+
+  if errors 
+    ul
+      for error in errors
+        li!= error.msg

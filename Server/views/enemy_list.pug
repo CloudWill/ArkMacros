@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  h1= title
+  
+  ul
+  each enemy in enemy_list
+    li 
+      a(href=enemy.url) #{enemy.steam_name} 
+      | (#{enemy.notes})
+
+  else
+    li There are no enemies.

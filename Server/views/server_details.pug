@@ -1,0 +1,14 @@
+extends layout
+
+block content
+
+  h1 Server: #{server.name}
+   
+  div(style='margin-left:20px;margin-top:20px')
+
+      
+  hr
+  p
+    a(href=server.url+'/delete') Delete Server
+  p
+    a(href=server.url+'/update') Update Server

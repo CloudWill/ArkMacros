@@ -1,0 +1,23 @@
+extends layout
+
+block content
+  h1=title
+
+  form(method='POST' action='')
+    div.form-group
+      label(for='steam_name') Steam Name:
+      input#steam_name.form-control(type='text', placeholder='Steam Name' name='steam_name' required='true' value=(undefined===ally ? '' : ally.steam_name) )
+      label(for='ign') ign:
+      input#ign.form-control(type='text', placeholder='In Game Name' name='ign' value=(undefined===ally ? '' : ally.ign))
+    div.form-group
+      label(for='battlemetrics_id') battlemetrics_id:
+      input#ign.form-control(type='text', placeholder='battlemetrics_id' name='battlemetrics_id' value=(undefined===ally ? '' : ally.battlemetrics_id))
+    div.form-group
+      label(for='notes') notes:
+      input#ign.form-control(type='text', placeholder='notes' name='notes' value=(undefined===ally ? '' : ally.notes))
+    button.btn.btn-primary(type='submit') Submit
+
+  if errors 
+    ul
+      for error in errors
+        li!= error.msg

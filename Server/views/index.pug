@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  h1= title
+  p Ark App - A developer was bored and decided to automate certain manual tasks in Ark: Survival Evolved
+
+  h1 Dynamic content
+
+  if error
+    p Error getting dynamic content.
+  else
+
+    p Current record counts:
+
+    ul
+      li #[strong Allies:] !{data.ally_count}
+      li #[strong Enemies:] !{data.enemy_count}
+      li #[strong Servers:] !{data.server_count}
+      li #[strong Tribes:] !{data.tribe_count}
+  

@@ -1,0 +1,28 @@
+extends layout
+
+block content
+
+  h1 #{title}: #{tribe.name}
+ 
+  if tribe_players.length
+  
+    p #[strong Delete the following players before attempting to delete this tribe.]
+  
+    div(style='margin-left:20px;margin-top:20px')
+
+      h4 Tribes
+    
+      dl
+      each player in tribe_players
+        dt 
+          a(href=player.url) #{player.name}
+        dd #{player.notes}
+
+  else
+    p Do you really want to delete this Tribe?
+    
+    form(method='POST' action='')
+      div.form-group
+        input#tribeid.form-control(type='hidden',name='tribeid', required='true', value=tribe._id )
+
+      button.btn.btn-primary(type='submit') Delete

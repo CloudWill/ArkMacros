@@ -1,0 +1,31 @@
+extends layout
+
+block content
+
+  h1 Tribe: #{tribe.name}
+
+  h3 Alignments: 
+    each val, index in tribe.alignment
+      a(href=val.url) #{val.alignment_name}
+      if index < tribe.alignment.length - 1
+        |, 
+  
+  div(style='margin-left:20px;margin-top:20px')
+
+    h4 Players
+    
+    
+    dl
+    each player in tribe_players
+      dt 
+        a(href=player.url) #{player.name}
+      dd #{player.notes}
+
+    else
+      p This tribe has no players.
+      
+  hr
+  p
+    a(href=tribe.url+'/delete') Delete tribe
+  p
+    a(href=tribe.url+'/update') Update tribe

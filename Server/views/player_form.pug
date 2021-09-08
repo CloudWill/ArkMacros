@@ -1,0 +1,30 @@
+extends layout
+
+block content
+  h1=title
+  form(method='POST' action='')
+    div.form-group
+      label(for='steam_name') Steam Name:
+      input#steam_name.form-control(type='text', placeholder='Steam Name' name='steam_name' required='true' value=(undefined===player ? '' : player.steam_name) )
+    div.form-group
+      label(for='tribe') Tribe:
+      select#tribe.form-control(type='select', placeholder='Select tribe' name='tribe' required='true' )
+        for tribe in tribes
+          if player
+            option(value=tribe._id selected=(tribe._id.toString()===player.tribe._id.toString() ? 'selected' : false) ) #{tribe.name}
+          else
+            option(value=tribe._id) #{tribe.name}
+      label(for='ign') ign:
+      input#ign.form-control(type='text', placeholder='In Game Name' name='ign' value=(undefined===player ? '' : player.ign))
+    div.form-group
+      label(for='battlemetrics_id') battlemetrics_id:
+      input#ign.form-control(type='text', placeholder='battlemetrics_id' name='battlemetrics_id' value=(undefined===player ? '' : player.battlemetrics_id))
+    div.form-group
+      label(for='notes') notes:
+      input#ign.form-control(type='text', placeholder='notes' name='notes' value=(undefined===player ? '' : player.notes))
+    button.btn.btn-primary(type='submit') Submit
+
+  if errors 
+    ul
+      for error in errors
+        li!= error.msg

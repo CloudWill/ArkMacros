@@ -1,0 +1,23 @@
+extends layout
+
+block content
+
+  h1 Alignment: #{alignment.alignment_name}
+  
+  div(style='margin-left:20px;margin-top:20px')
+
+    h4 Tribes
+    
+    dl
+    each tribe in alignment_tribes
+      dt 
+        a(href=tribe.url) #{tribe.tribe_name}
+
+    else
+      p This alignment has no tribes.
+      
+  hr
+  p
+    a(href=alignment.url+'/delete') Delete alignment
+  p
+    a(href=alignment.url+'/update') Update alignment

@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  h1= title
+  
+  ul
+  li Steam Name | IGN | Tribe Name | Alignment | Notes
+  each player in player_list
+    li
+      a(href=player.url) #{player.steam_name} </a> | #{player.ign} |  #{player.tribe.tribe_name} | #{player.tribe.alignment.alignment_name} |  #{player.notes}} 
+  else
+    li There are no players.

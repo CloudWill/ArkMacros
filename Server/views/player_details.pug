@@ -1,0 +1,20 @@
+extends layout
+
+block content
+
+  h1 Player Information
+  br
+  br
+  h2 Steam Name: #{player.steam_name}
+  h2 IGN: #{player.ign}
+  h2 Tribe: #{player.tribe.tribe_name}
+  h2 Notes: #{player.notes}
+  h2 Battlemetrics ID: #{player.battlemetrics_id}
+  div(style='margin-left:20px;margin-top:20px')
+
+      
+  hr
+  p
+    a(href=player.url+'/delete') Delete Player
+  p
+    a(href=player.url+'/update') Update Player

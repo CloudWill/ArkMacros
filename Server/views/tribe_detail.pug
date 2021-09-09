@@ -1,0 +1,65 @@
+extends layout
+
+block content
+
+    h1 Tribe: #{tribe.name}
+    br
+    br
+
+    table(style='width:100%', border='1')
+        tr
+        th Alignments
+        each val, index in tribe.alignment
+            tr 
+                th 
+                    a(href=val.url) #{val.alignment_name}
+        else
+            tr
+            td This tribe has not been assigned an alignment
+    br
+
+  
+    table(style='width:100%', border='1')
+        tr
+        th Server Cluster 
+        each val, index in tribe.servercluster
+            tr 
+                th 
+                    a(href=val.url) #{val.servercluster_name}
+        else
+            tr
+            td This tribe is not been assigned a server cluster
+
+    div(style='margin-left:20px;margin-top:20px')
+
+    h4 Players
+    
+    table(style='width:100%', border='1')
+        
+        tr
+            th steam name 
+            th in game name (ign)
+            th battlemetrics_id
+            th notes
+
+        each player in tribe_players
+            tr 
+            th 
+                a(href=player.url) #{player.steam_name}
+            th 
+                a(href=player.url) #{player.ign}
+            th 
+                a(href=player.url) #{player.battlemetrics_id}
+            th 
+                a(href=player.url) #{player.notes}
+
+        else
+            tr
+                td There are no players assigned to this tribe.
+
+
+    hr
+    p
+    a(href=tribe.url+'/delete') Delete tribe
+    p
+    a(href=tribe.url+'/update') Update tribe

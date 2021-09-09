@@ -1,0 +1,34 @@
+extends layout
+
+block content
+
+    h1 #{title}: #{tribe.name}
+ 
+    if tribe_players.length
+  
+        p #[strong Delete the following players before attempting to delete this tribe.]
+  
+        div(style='margin-left:20px;margin-top:20px')
+
+        table(style='width:100%', border='1')
+        
+            tr
+                th Steam Name
+                th In Game Name (ign)
+                th Notes
+            each player in tribe_players
+                tr 
+                th 
+                        a(href="player/" + player._id) #{player.steam_name}
+                th 
+                        a(href="player/" + player._id) #{player.ign}    
+                th #{player.notes}
+
+    else
+        p Do you really want to delete this Tribe?
+    
+        form(method='POST' action='')
+            div.form-group
+            input#tribeid.form-control(type='hidden',name='tribeid', required='true', value=tribe._id )
+
+            button.btn.btn-primary(type='submit') Delete

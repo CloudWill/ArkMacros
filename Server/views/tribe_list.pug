@@ -1,0 +1,28 @@
+extends layout
+
+block content
+    h1= title
+    table(style='width:100%', border='1')
+        
+        tr
+            th Tribe Name
+            th Alignments
+            th Server Cluster
+        each tribe in tribe_list
+            tr 
+            th 
+                a(href=tribe.url) #{tribe.name}
+            th
+                each align, val in tribe.alignment
+                    if (val > 0)
+                        |,   
+                    a(href=align.url) #{align.alignment_name} 
+            th 
+                each cluster, val in tribe.servercluster
+                    if (val > 0)
+                        |, 
+                    a(href=tribe.servercluster[val].url) #{tribe.servercluster[val].servercluster_name}
+
+        else
+            td There are no tribes.
+

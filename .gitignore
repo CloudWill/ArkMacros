@@ -12,7 +12,6 @@ __pycache__/
 /Discord/commands/DiscordBotLog.txt
 /Discord/test.env
 /Discord/commands/test.env
-/Macros/*.bat
 /Macros/SetupFiles/*.bat
 /Macros/OCR/Images
 /Macros/OCR/Images - Copy
@@ -21,3 +20,11 @@ Server/.env
 Server/.vs
 Server/OCR/Images
 Server/node_modules
+/Macros/.idea
+/Server/.idea
+/Macros/autoDrop.bat
+/Macros/autoDropCalibration.bat
+/Macros/autoE.bat
+/Macros/autoExit.bat
+/Macros/autoW.bat
+/Macros/resetSettings.bat

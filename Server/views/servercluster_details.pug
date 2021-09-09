@@ -1,0 +1,40 @@
+extends layout
+
+block content
+
+    h1 Servercluster: #{servercluster.servercluster_name}
+  
+    div(style='margin-left:20px;margin-top:20px')
+
+    table(style='width:100%', border='1')
+        tr
+            th Servers in this cluster
+            th Server Id
+            each server in servercluster_servers
+                tr 
+                    th
+                        a(href=server.url) #{server.server_name}
+                    th
+                        a(href=server.url) #{server.server_id}
+            else
+                tr
+                    th There are no servers assigned to this server cluster
+    br
+    br
+    table(style='width:100%', border='1')
+        tr
+            th Tribes in #{servercluster.servercluster_name}
+            each tribe in tribes
+                tr 
+                    th
+                        a(href=tribe.url) #{tribe.tribe_name}
+            else
+                tr
+                    th There are no tribes assigned to this server cluster
+
+      
+    hr
+    p
+    a(href=servercluster.url+'/delete') Delete Cluster 
+    p
+    a(href=servercluster.url+'/update') Update Cluster

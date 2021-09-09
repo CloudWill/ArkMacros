@@ -1,0 +1,32 @@
+extends layout
+
+block content
+
+  h1 Player Information
+
+  div(style='margin-left:20px;margin-top:20px')
+
+
+    h4 Player Information
+    
+    table(style='width:100%', border='1')
+        
+        tr
+            th steam name 
+            th in game name (ign)
+            th Tribe
+            th battlemetrics_id
+            th notes
+
+            tr 
+            th #{player.steam_name}
+            th #{player.ign}
+            th #{player.tribe.tribe_name}
+            th #{player.battlemetrics_id}
+            th #{player.notes}
+      
+  hr
+  p
+    a(href=player.url+'/delete') Delete Player
+  p
+    a(href=player.url+'/update') Update Player

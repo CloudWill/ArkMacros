@@ -6,6 +6,11 @@ block content
    
   div(style='margin-left:20px;margin-top:20px')
 
+  h3 Server Cluster: 
+    each val, index in server.servercluster
+      a(href=val.url) #{val.servercluster_name}
+      if index < server.servercluster.length - 1
+        |, 
       
   hr
   p

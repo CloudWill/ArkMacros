@@ -5,7 +5,8 @@ var Schema = mongoose.Schema;
 
 var TribeSchema = new Schema({
     tribe_name: { type: String, required: true },
-    alignment: { type: [Schema.ObjectId], ref: 'Alignment' }
+    alignment: { type: [Schema.ObjectId], ref: 'Alignment' },
+    servercluster: { type: [Schema.ObjectId], ref: 'Servercluster' }
 });
 
 // Virtual

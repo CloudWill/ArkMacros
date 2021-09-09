@@ -6,15 +6,19 @@ block content
   
   div(style='margin-left:20px;margin-top:20px')
 
-    h4 Tribes
-    
-    dl
-    each tribe in alignment_tribes
-      dt 
-        a(href=tribe.url) #{tribe.tribe_name}
 
-    else
-      p This alignment has no tribes.
+  table(style='width:100%', border='1')
+        tr
+            th Alignments
+            th 
+        each tribe in alignment_tribes
+            tr 
+                th
+                    a(href=tribe.url) #{tribe.tribe_name}
+
+        else
+            tr
+                th There are no tribes assigned to this alignment
       
   hr
   p

@@ -2,6 +2,7 @@ var Tribe = require('../models/tribe')
 var async = require('async')
 var Player = require('../models/player')
 var Alignment = require('../models/alignment')
+var Servercluster = require('../models/servercluster')
 
 const { body, validationResult } = require("express-validator");
 
@@ -9,6 +10,7 @@ const { body, validationResult } = require("express-validator");
 exports.tribe_list = function (req, res, next) {
 
     Tribe.find()
+        .populate('alignment servercluster')
         .sort([['tribe_name', 'ascending']])
         .exec(function (err, list_tribes) {
             if (err) { return next(err); }
@@ -23,11 +25,11 @@ exports.tribe_detail = function (req, res, next) {
 
     async.parallel({
         tribe: function (callback) {
-            Tribe.findById(req.params.id).populate('alignment')
+            Tribe.findById(req.params.id).populate('alignment servercluster')
                 .exec(callback)
         },
         tribes_players: function (callback) {
-            Player.find({ 'tribe': req.params.id }, 'player summary')
+            Player.find({ 'tribe': req.params.id }, 'steam_name ign battlemetrics_id notes')
                 .exec(callback)
         }
     }, function (err, results) {
@@ -46,14 +48,17 @@ exports.tribe_detail = function (req, res, next) {
 // Display create form on GET.
 exports.tribe_create_get = function (req, res, next) {
 
-    // Get all details to add to tribe
+    // Get all details
     async.parallel({
         alignments: function (callback) {
             Alignment.find(callback);
         },
+        serverclusters: function (callback) {
+            Servercluster.find(callback);
+        },
     }, function (err, results) {
         if (err) { return next(err); }
-        res.render('tribe_form', { title: 'Create Tribe', alignments: results.alignments });
+        res.render('tribe_form', { title: 'Create Tribe', alignments: results.alignments, serverclusters: results.serverclusters});
     });    
 };
 
@@ -71,10 +76,24 @@ exports.tribe_create_post = [
             }
         }
         next();
-    }, 
+    },
+    // Convert to an array.
+    (req, res, next) => {
+        if (!(req.body.servercluster instanceof Array)) {
+            if (typeof req.body.servercluster === 'undefined') {
+                req.body.servercluster = [];
+            }
+            else {
+                req.body.servercluster = new Array(req.body.servercluster);
+            }
+        }
+        next();
+    },
+
     // Validate and sanitize fields.
     body('tribe_name').trim().isLength({ min: 1 }).escape().withMessage('Tribe name must be specified.'),
     body('alignment.*').escape(),
+    body('servercluster.*').escape(),
     // Process request after validation and sanitization.
     (req, res, next) => {
 
@@ -86,13 +105,17 @@ exports.tribe_create_post = [
             {
                 tribe_name: req.body.tribe_name,
                 alignment: req.body.alignment,
+                servercluster: req.body.servercluster,
             }
-        );W
+        );
         if (!errors.isEmpty()) {
 
             async.parallel({
                 alignments: function (callback) {
                     Alignment.find(callback);
+                },
+                serverclusters: function (callback) {
+                    Servercluster.find(callback);
                 },
             }, function (err, results) {
                 if (err) { return next(err); }
@@ -102,14 +125,19 @@ exports.tribe_create_post = [
                         results.alignments[i].checked = 'true';
                     }
                 }
+                // Mark our selected as checked.
+                for (let i = 0; i < results.serverclusters.length; i++) {
+                    if (tribe.servercluster.indexOf(results.serverclusters[i]._id) > -1) {
+                        results.serverclusters[i].checked = 'true';
+                    }
+                }
                 // There are errors. Render form again with sanitized values/errors messages.
-                res.render('tribe_form', { title: 'Create Tribe', tribe: results.tribe, alignments: results.alignment, errors: errors.array() });
+                res.render('tribe_form', { title: 'Create Tribe', tribe: results.tribe, alignments: results.alignment, serverclusters: results.serverclusters, errors: errors.array() });
             });
             return;
         }
         else {
             // Data from form is valid.
-            console.log('tribe is ' + tribe)
             // Save.
             tribe.save(function (err) {
                 if (err) { return next(err); }
@@ -182,6 +210,9 @@ exports.tribe_update_get = function (req, res, next) {
         alignments: function (callback) {
             Alignment.find(callback);
         },
+        serverclusters: function (callback) {
+            Servercluster.find(callback);
+        },
     }, function (err, results) {
         if (err) { return next(err); }
         if (results.tribe == null) { // No results.
@@ -198,7 +229,14 @@ exports.tribe_update_get = function (req, res, next) {
                 }
             }
         }
-        res.render('tribe_form', { title: 'Update Tribe', tribe: results.tribe, alignments: results.alignments });
+        for (var all_iter = 0; all_iter < results.serverclusters.length; all_iter++) {
+            for (var tribe_iter = 0; tribe_iter < results.tribe.servercluster.length; tribe_iter++) {
+                if (results.serverclusters[all_iter]._id.toString() === results.tribe.servercluster[tribe_iter]._id.toString()) {
+                    results.serverclusters[all_iter].checked = 'true';
+                }
+            }
+        }
+        res.render('tribe_form', { title: 'Update Tribe', tribe: results.tribe, alignments: results.alignments, serverclusters: results.serverclusters });
     });
 };
 
@@ -207,6 +245,8 @@ exports.tribe_update_post = [
 
     // Validate and santize fields.
     body('tribe_name').trim().isLength({ min: 1 }).escape().withMessage('Tribe name must be specified.'),
+    body('alignment.*').escape(),
+    body('servercluster.*').escape(),
 
     // Process request after validation and sanitization.
     (req, res, next) => {
@@ -219,6 +259,7 @@ exports.tribe_update_post = [
             {
                 tribe_name: req.body.tribe_name,
                 alignment: req.body.alignment,
+                servercluster: req.body.servercluster,
                 _id: req.params.id
             }
         );

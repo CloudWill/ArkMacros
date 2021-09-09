@@ -1,13 +1,27 @@
 extends layout
 
 block content
-  h1= title
-  
-  ul
-  each server in server_list
-    li 
-      a(href=server.url) #{server.server_name} 
-      | (#{server.server_id})
+    h1= title
+    table(style='width:100%', border='1')
+        
+        tr
+            th Server Name
+            th Server Id
+            th Cluster
+        each server in server_list
+            tr 
+            th 
+                a(href=server.url) #{server.server_name}
+            th 
+                a(href=server.url) #{server.server_id}
+            th
+                 each cluster, val in server.servercluster
+                        if (val > 0)
+                            |, 
+                        a(href=server.servercluster[val].url) #{server.servercluster[val].servercluster_name}
+                 else
+                    |There is no cluster assigned to this server
 
-  else
-    li There are no servers.
+
+        else
+            td There are no servers.

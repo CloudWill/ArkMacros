@@ -1,4 +1,5 @@
 var Servercluster = require('../models/servercluster');
+var Server = require('../models/server');
 var Tribe = require('../models/tribe');
 var async = require('async');
 
@@ -22,13 +23,16 @@ exports.servercluster_detail = function (req, res, next) {
 
     async.parallel({
         servercluster: function (callback) {
-
             Servercluster.findById(req.params.id)
                 .exec(callback);
         },
 
-        servercluster_tribes: function (callback) {
-            Tribe.find({ 'servercluster': req.params.id })
+        servercluster_servers: function (callback) {
+            Server.find({ 'servercluster': req.params.id }).sort([['server_name', 'ascending']])
+                .exec(callback);
+        },
+        tribes: function (callback) {
+            Tribe.find({ 'servercluster': req.params.id }).sort([['tribe_name', 'ascending']])
                 .exec(callback);
         },
 
@@ -40,7 +44,7 @@ exports.servercluster_detail = function (req, res, next) {
             return next(err);
         }
         // Successful, so render.
-        res.render('servercluster_detail', { title: 'Servercluster Detail', servercluster: results.servercluster, servercluster_tribes: results.servercluster_tribes });
+        res.render('servercluster_details', { title: 'Servercluster Detail', servercluster: results.servercluster, servercluster_servers: results.servercluster_servers, tribes: results.tribes });
     });
 
 };
@@ -54,7 +58,7 @@ exports.servercluster_create_get = function (req, res, next) {
 exports.servercluster_create_post = [
 
     // Validate and santise the name field.
-    body('servercluster', 'Servercluster name must contain at least 3 characters').trim().isLength({ min: 3 }).escape(),
+    body('servercluster_name', 'Servercluster name must contain at least 3 characters').trim().isLength({ min: 3 }).escape(),
 
     // Process request after validation and sanitization.
     (req, res, next) => {
@@ -64,7 +68,7 @@ exports.servercluster_create_post = [
 
         // Create a servercluster object with escaped and trimmed data.
         var servercluster = new Servercluster(
-            { servercluster: req.body.servercluster }
+            { servercluster_name: req.body.servercluster_name }
         );
 
 
@@ -76,7 +80,7 @@ exports.servercluster_create_post = [
         else {
             // Data from form is valid.
             // Check if Servercluster with same name already exists.
-            Servercluster.findOne({ 'name': req.body.name })
+            Servercluster.findOne({ 'servercluster_name': req.body.servercluster_name })
                 .exec(function (err, found_servercluster) {
                     if (err) { return next(err); }
 
@@ -106,8 +110,8 @@ exports.servercluster_delete_get = function (req, res, next) {
         servercluster: function (callback) {
             Servercluster.findById(req.params.id).exec(callback);
         },
-        servercluster_tribes: function (callback) {
-            Tribe.find({ 'servercluster': req.params.id }).exec(callback);
+        servercluster_servers: function (callback) {
+            Server.find({ 'servercluster': req.params.id }).exec(callback);
         },
     }, function (err, results) {
         if (err) { return next(err); }
@@ -115,7 +119,7 @@ exports.servercluster_delete_get = function (req, res, next) {
             res.redirect('/catalog/serverclusters');
         }
         // Successful, so render.
-        res.render('servercluster_delete', { title: 'Delete Servercluster', servercluster: results.servercluster, servercluster_tribes: results.servercluster_tribes });
+        res.render('servercluster_delete', { title: 'Delete Servercluster', servercluster: results.servercluster, servercluster_servers: results.servercluster_servers });
     });
 
 };
@@ -127,19 +131,19 @@ exports.servercluster_delete_post = function (req, res, next) {
         servercluster: function (callback) {
             Servercluster.findById(req.params.id).exec(callback);
         },
-        servercluster_tribes: function (callback) {
-            Tribe.find({ 'servercluster': req.params.id }).exec(callback);
+        servercluster_servers: function (callback) {
+            Server.find({ 'servercluster': req.params.id }).exec(callback);
         },
     }, function (err, results) {
         if (err) { return next(err); }
         // Success
-        if (results.servercluster_tribes.length > 0) {
-            // Servercluster has tribes. Render in same way as for GET route.
-            res.render('servercluster_delete', { title: 'Delete Servercluster', servercluster: results.servercluster, servercluster_tribes: results.servercluster_tribes });
+        if (results.servercluster_servers.length > 0) {
+            // Servercluster has servers. Render in same way as for GET route.
+            res.render('servercluster_delete', { title: 'Delete Servercluster', servercluster: results.servercluster, servercluster_servers: results.servercluster_servers });
             return;
         }
         else {
-            // Servercluster has no tribes. Delete object and redirect to the list of serverclusters.
+            // Servercluster has no servers. Delete object and redirect to the list of serverclusters.
             Servercluster.findByIdAndRemove(req.body.id, function deleteServercluster(err) {
                 if (err) { return next(err); }
                 // Success - go to serverclusters list.
@@ -171,7 +175,7 @@ exports.servercluster_update_get = function (req, res, next) {
 exports.servercluster_update_post = [
 
     // Validate and sanitze the name field.
-    body('name', 'Servercluster name must contain at least 3 characters').trim().isLength({ min: 3 }).escape(),
+    body('servercluster_name', 'Servercluster name must contain at least 3 characters').trim().isLength({ min: 3 }).escape(),
 
 
     // Process request after validation and sanitization.
@@ -183,7 +187,7 @@ exports.servercluster_update_post = [
         // Create a servercluster object with escaped and trimmed data (and the old id!)
         var servercluster = new Servercluster(
             {
-                name: req.body.name,
+                servercluster_name: req.body.servercluster_name,
                 _id: req.params.id
             }
         );

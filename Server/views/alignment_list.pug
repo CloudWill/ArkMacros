@@ -1,12 +1,16 @@
 extends layout
 
 block content
-  h1= title
+    h1= title
   
-  ul
-  each val in list_alignments
-    li 
-      a(href=val.url) #{val.alignment_name}
-
-  else
-    li There are no alignments.
+    ul
+    table(style='width:100%', border='1')
+        tr
+        th Alignments
+        each val in list_alignments
+            tr 
+                th 
+                    a(href=val.url) #{val.alignment_name}
+        else
+            tr
+                th There are no alignments.

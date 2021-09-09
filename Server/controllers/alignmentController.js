@@ -40,7 +40,7 @@ exports.alignment_detail = function (req, res, next) {
             return next(err);
         }
         // Successful, so render.
-        res.render('alignment_details', { title: 'Alignment Detail', alignment: results.alignment, alignment_tribes: results.alignment_tribes });
+        res.render('alignment_details', { title: 'Alignment Details', alignment: results.alignment, alignment_tribes: results.alignment_tribes });
     });
 
 };

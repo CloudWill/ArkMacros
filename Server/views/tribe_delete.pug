@@ -2,27 +2,33 @@ extends layout
 
 block content
 
-  h1 #{title}: #{tribe.name}
+    h1 #{title}: #{tribe.name}
  
-  if tribe_players.length
+    if tribe_players.length
   
-    p #[strong Delete the following players before attempting to delete this tribe.]
+        p #[strong Delete the following players before attempting to delete this tribe.]
   
-    div(style='margin-left:20px;margin-top:20px')
+        div(style='margin-left:20px;margin-top:20px')
 
-      h4 Tribes
+        table(style='width:100%', border='1')
+        
+            tr
+                th Steam Name
+                th In Game Name (ign)
+                th Notes
+            each player in tribe_players
+                tr 
+                th 
+                        a(href="player/" + player._id) #{player.steam_name}
+                th 
+                        a(href="player/" + player._id) #{player.ign}    
+                th #{player.notes}
+
+    else
+        p Do you really want to delete this Tribe?
     
-      dl
-      each player in tribe_players
-        dt 
-          a(href=player.url) #{player.name}
-        dd #{player.notes}
+        form(method='POST' action='')
+            div.form-group
+            input#tribeid.form-control(type='hidden',name='tribeid', required='true', value=tribe._id )
 
-  else
-    p Do you really want to delete this Tribe?
-    
-    form(method='POST' action='')
-      div.form-group
-        input#tribeid.form-control(type='hidden',name='tribeid', required='true', value=tribe._id )
-
-      button.btn.btn-primary(type='submit') Delete
+            button.btn.btn-primary(type='submit') Delete

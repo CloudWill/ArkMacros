@@ -4,9 +4,7 @@ var router = express.Router();
 
 
 // Require our controllers.
-var ally_controller = require('../controllers/allyController');
 var index_controller = require('../controllers/indexController');
-var enemy_controller = require('../controllers/enemyController');
 var server_controller = require('../controllers/serverController');
 var player_controller = require('../controllers/playerController');
 var tribe_controller = require('../controllers/tribeController');
@@ -21,29 +19,7 @@ router.get('/', index_controller.index);
 
 /// ALLY ROUTES ///
 
-// GET request for creating Ally. NOTE This must come before route for id (i.e. display ally).
-router.get('/ally/create', ally_controller.ally_create_get);
 
-// POST request for creating Ally.
-router.post('/ally/create', ally_controller.ally_create_post);
-
-// GET request to delete Ally.
-router.get('/ally/:id/delete', ally_controller.ally_delete_get);
-
-// POST request to delete Ally
-router.post('/ally/:id/delete', ally_controller.ally_delete_post);
-
-// GET request to update Ally.
-router.get('/ally/:id/update', ally_controller.ally_update_get);
-
-// POST request to update Ally.
-router.post('/ally/:id/update', ally_controller.ally_update_post);
-
-// GET request for one Ally.
-router.get('/ally/:id', ally_controller.ally_detail);
-
-// GET request for list of all Allys.
-router.get('/allies', ally_controller.ally_list);
 
 
 /// PLAYER ROUTES ///
@@ -69,8 +45,18 @@ router.post('/player/:id/update', player_controller.player_update_post);
 // GET request for one
 router.get('/player/:id', player_controller.player_detail);
 
-// GET request for list of all 
+// GET request for list of all players
 router.get('/players', player_controller.player_list);
+
+// GET request for list of all Allys.
+router.get('/allies', player_controller.ally_list);
+
+// GET request for list of all enemy.
+router.get('/enemies', player_controller.enemy_list);
+
+// GET request for list of all neutrals
+router.get('/neutrals', player_controller.neutral_list);
+
 
 /// TRIBE ROUTES ///
 
@@ -98,29 +84,6 @@ router.get('/tribe/:id', tribe_controller.tribe_detail);
 // GET request for list of all 
 router.get('/tribes', tribe_controller.tribe_list);
 
-// GET request for creating enemy. NOTE This must come before route for id (i.e. display enemy).
-router.get('/enemy/create', enemy_controller.enemy_create_get);
-
-// POST request for creating enemy.
-router.post('/enemy/create', enemy_controller.enemy_create_post);
-
-// GET request to delete enemy.
-router.get('/enemy/:id/delete', enemy_controller.enemy_delete_get);
-
-// POST request to delete enemy
-router.post('/enemy/:id/delete', enemy_controller.enemy_delete_post);
-
-// GET request to update enemy.
-router.get('/enemy/:id/update', enemy_controller.enemy_update_get);
-
-// POST request to update enemy.
-router.post('/enemy/:id/update', enemy_controller.enemy_update_post);
-
-// GET request for one enemy.
-router.get('/enemy/:id', enemy_controller.enemy_detail);
-
-// GET request for list of all enemy.
-router.get('/enemies', enemy_controller.enemy_list);
 
 //SERVER ROUTES
 router.get('/server/create', server_controller.server_create_get);
@@ -157,28 +120,29 @@ router.get('/alignment/:id', alignment_controller.alignment_detail);
 router.get('/alignments', alignment_controller.alignment_list);
 
 // SERVER CLUSTER ROUTES
-//router.get('/servercluster/create', servercluster_controller.servercluster_create_get);
+router.get('/servercluster/create', servercluster_controller.servercluster_create_get);
 
-//router.post('/servercluster/create', servercluster_controller.servercluster_create_post);
+router.post('/servercluster/create', servercluster_controller.servercluster_create_post);
 
-//router.get('/servercluster/:id/delete', servercluster_controller.servercluster_delete_get);
+router.get('/servercluster/:id/delete', servercluster_controller.servercluster_delete_get);
 
-//router.post('/servercluster/:id/delete', servercluster_controller.servercluster_delete_post);
+router.post('/servercluster/:id/delete', servercluster_controller.servercluster_delete_post);
 
-//router.get('/servercluster/:id/update', servercluster_controller.servercluster_update_get);
+router.get('/servercluster/:id/update', servercluster_controller.servercluster_update_get);
 
-//router.post('/servercluster/:id/update', servercluster_controller.servercluster_update_post);
+router.post('/servercluster/:id/update', servercluster_controller.servercluster_update_post);
 
-//router.get('/servercluster/:id', servercluster_controller.servercluster_detail);
+router.get('/servercluster/:id', servercluster_controller.servercluster_detail);
 
-//router.get('/serverclusters', servercluster_controller.servercluster_list);
+router.get('/serverclusters', servercluster_controller.servercluster_list);
 
 
 
 
 // APIs
-router.get('/allies/api', ally_controller.ally_api_get);
-router.get('/enemies/api', enemy_controller.enemy_api_get);
+router.get('/api/get_ally_players', player_controller.api_get_allies);
+router.get('/api/get_enemy_players', player_controller.api_get_enemies);
+
 router.get('/servers/api', server_controller.server_api_get);
 
 module.exports = router;

@@ -1,12 +1,38 @@
 extends layout
 
 block content
-  h1= title
-  
-  ul
-  li Steam Name | IGN | Tribe Name | Alignment | Notes
-  each player in player_list
-    li
-      a(href=player.url) #{player.steam_name} </a> | #{player.ign} |  #{player.tribe.tribe_name} | #{player.tribe.alignment.alignment_name} |  #{player.notes}} 
-  else
-    li There are no players.
+    h1= title
+
+    div(style='margin-left:20px;margin-top:20px')
+
+    table(style='width:100%', border='1')
+        
+        tr
+            th Steam Name
+            th In Game Name (ign)
+            th Tribe Name 
+            th Server
+            th Notes
+        each player in player_list
+            tr 
+            th 
+                 a(href="player/" + player._id) #{player.steam_name}
+            th 
+                 a(href="player/" + player._id) #{player.ign}
+            if (player.tribe.tribe_name !== undefined)
+                th 
+                    a(href="tribe/" + player.tribe._id) #{player.tribe.tribe_name}
+            else
+                th 
+                    a(href="tribe/" + player.tribe[0]._id) #{player.tribe[0].tribe_name}         
+            th
+                each cluster, key in player.serverclusters
+                      a(href="servercluster/" + player.serverclusters[key]._id) #{player.serverclusters[key].servercluster_name}, 
+                else
+                    |Not Assigned
+            th #{player.notes}
+
+        else
+            td There are no players. 
+
+

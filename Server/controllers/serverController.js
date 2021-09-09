@@ -1,12 +1,14 @@
 var Server = require('../models/server')
+var Servercluster = require('../models/servercluster')
 var async = require('async')
 
-const { body,validationResult } = require("express-validator");
+const { body, validationResult } = require("express-validator");
 
 // Display list of all server.
 exports.server_list = function (req, res, next) {
 
     Server.find()
+        .populate('servercluster')
         .sort([['server_name', 'ascending']])
         .exec(function (err, list_servers) {
             if (err) { return next(err); }
@@ -21,7 +23,7 @@ exports.server_detail = function (req, res, next) {
 
     async.parallel({
         server: function (callback) {
-            Server.findById(req.params.id)
+            Server.findById(req.params.id).populate('servercluster')
                 .exec(callback)
         }
     }, function (err, results) {
@@ -33,14 +35,23 @@ exports.server_detail = function (req, res, next) {
         }
         // Successful, so render.
         console.log(results.enemy);
-        res.render('server_details', { title: 'Server Details', server: results.server});
+        res.render('server_details', { title: 'Server Details', server: results.server });
     });
 
 };
 
 // Display server create form on GET.
 exports.server_create_get = function (req, res, next) {
-    res.render('server_form', { title: 'Create server' });
+
+    // Get all details
+    async.parallel({
+        serverclusters: function (callback) {
+            Servercluster.find(callback);
+        },
+    }, function (err, results) {
+        if (err) { return next(err); }
+        res.render('server_form', { title: 'Create Server', serverclusters: results.serverclusters });
+    });
 };
 
 // Handle server create on POST.
@@ -48,16 +59,17 @@ exports.server_create_post = [
     // Validate and sanitize fields.
     body('server_name').trim().isLength({ min: 1 }).escape().withMessage('server name must be specified.'),
     body('server_id').trim().isLength({ min: 1 }).escape().withMessage('server id must be specified.'),
+    body('servercluster.*').escape(),
     // Process request after validation and sanitization.
     (req, res, next) => {
         // Extract the validation errors from a request.
         const errors = validationResult(req);
-        
         // Create enemy object with escaped and trimmed data
         var server = new Server(
             {
                 server_name: req.body.server_name,
-                server_id: req.body.server_id
+                server_id: req.body.server_id,
+                servercluster: req.body.servercluster
             }
         );
 
@@ -69,14 +81,27 @@ exports.server_create_post = [
         }
         else {
             // Data from form is valid.
+            Server.findOne({ 'server_id': req.body.server_id })
+                .exec(function (err, found_server) {
+                    if (err) { return next(err); }
 
-            // Save enemy.
-            server.save(function (err) {
-                if (err) { return next(err); }
-                console.log('redirecting')
-                // Successful - redirect to new enemy record.
-                res.redirect(server.url);
-            });
+                    if (found_server) {
+                        // exists, redirect to its detail page.
+                        res.redirect(found_server.url);
+                    }
+                    else {
+                        // Data from form is valid.
+                        // Save
+                        server.save(function (err) {
+                            if (err) { return next(err); }
+                            console.log('redirecting')
+                            // Successful - redirect to record
+                            res.redirect(server.url);
+                        });
+
+                    }
+
+                });
         }
     }
 ];
@@ -94,7 +119,7 @@ exports.server_delete_get = function (req, res, next) {
             res.redirect('/catalog/servers');
         }
         // Successful, so render.
-        res.render('server_delete', { title: 'Delete Server', server: results.server});
+        res.render('server_delete', { title: 'Delete Server', server: results.server });
     });
 
 };
@@ -123,16 +148,31 @@ exports.server_delete_post = function (req, res, next) {
 // Display server update form on GET.
 exports.server_update_get = function (req, res, next) {
 
-    Server.findById(req.params.id, function (err, server) {
+    // Get data for form.
+    async.parallel({
+        server: function (callback) {
+            Server.findById(req.params.id).populate('servercluster').exec(callback);
+        },
+        serverclusters: function (callback) {
+            Servercluster.find(callback);
+        },
+    }, function (err, results) {
         if (err) { return next(err); }
-        if (server == null) { // No results.
+        if (results.server == null) { // No results.
             var err = new Error('Server not found');
             err.status = 404;
             return next(err);
         }
         // Success.
-        res.render('server_form', { title: 'Update Server', server: server });
-
+        // Mark our selectedas checked.
+        for (var all_iter = 0; all_iter < results.serverclusters.length; all_iter++) {
+            for (var server_iter = 0; server_iter < results.server.servercluster.length; server_iter++) {
+                if (results.serverclusters[all_iter]._id.toString() === results.server.servercluster[server_iter]._id.toString()) {
+                    results.serverclusters[all_iter].checked = 'true';
+                }
+            }
+        }
+        res.render('server_form', { title: 'Update Server', server: results.server, serverclusters: results.serverclusters });
     });
 };
 
@@ -142,19 +182,18 @@ exports.server_update_post = [
     // Validate and santize fields.
     body('server_name').trim().isLength({ min: 1 }).escape().withMessage('server name must be specified.'),
     body('server_id').trim().isLength({ min: 1 }).escape().withMessage('server id must be specified.'),
-
-
+    body('servercluster.*').escape(),
     // Process request after validation and sanitization.
     (req, res, next) => {
 
         // Extract the validation errors from a request.
         const errors = validationResult(req);
-
         // Create server object with escaped and trimmed data (and the old id)
         var server = new Server(
             {
                 server_name: req.body.server_name,
                 server_id: req.body.server_id,
+                servercluster: req.body.servercluster,
                 _id: req.params.id
             }
         );

@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var ServerclusterSchema = new Schema({
-    servercluster: {type: String, required: true}
+    servercluster_name: {type: String, required: true}
 });
 
 // Virtual for this instance URL.

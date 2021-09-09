@@ -5,27 +5,61 @@ var async = require('async')
 const { body, validationResult } = require("express-validator");
 
 
-// Display list
-exports.player_list = function (req, res, next) {
+function get_players_filter_alignment(req, res, next, val, api) {
+    const filter =
+        [{
+            $lookup:
+            {
+                from: "tribes",
+                localField: "tribe",
+                foreignField: "_id",
+                as: "tribe"
+            },
+        },
+        {
+            $lookup:
+            {
+                from: "alignments",
+                localField: "tribe.alignment",
+                foreignField: "_id",
+                as: "alignments"
+            }
+            },
+        {
+            $lookup:
+            {
+                from: "serverclusters",
+                localField: "tribe.servercluster",
+                foreignField: "_id",
+                as: "serverclusters"
+            }
+            },
 
-    Player.find({}, 'steam_name')
-        .populate('tribe').exec(function (err, list_players) {
+            { $match: { "alignments.alignment_name": { $in: val } } },
+            { $sort: { "steam_name": 1} }
+
+
+            ];
+            Player.aggregate(filter)
+        .exec(function (err, list_players) {
             if (err) { return next(err) }
             else {
                 // Successful, so render
-                res.render('player_list', { title: 'Player List', player_list: list_players });
+                if (api === true) {
+                    res.send(list_players);
+                }
+                else {
+                    res.render('player_list', { title: val + ' List', player_list: list_players });
+                }
             }
         });
-
 };
 
 // Display detail page.
 exports.player_detail = function (req, res, next) {
-
     async.parallel({
         player: function (callback) {
-            Player.findById(req.params.id)
-                .populate('tribe')
+            Player.findById(req.params.id).populate('tribe')
                 .exec(callback)
         }
     }, function (err, results) {
@@ -36,10 +70,55 @@ exports.player_detail = function (req, res, next) {
             return next(err);
         }
         // Successful, so render.
-        console.log(results.player);
-        res.render('player_details', { title: 'Player Detail', player: results.player});
+        res.render('player_details', { title: 'Player Detail', player: results.player });
     });
 
+}
+
+// Display lists
+exports.player_list = function (req, res, next) {
+    get_players_filter_alignment(req, res, next, ['Ally', 'Enemy', 'Neutral'], false)
+};
+
+exports.ally_list = function (req, res, next) {
+    get_players_filter_alignment(req, res, next, ['Ally'], false)
+};
+
+exports.neutral_list = function (req, res, next) {
+    get_players_filter_alignment(req, res, next, ['Neutral'], false)
+};
+
+exports.enemy_list = function (req, res, next) {
+    get_players_filter_alignment(req, res, next, ['Enemy'], false)
+};
+
+
+// APIs for lists
+exports.api_get_allies = function (req, res, next) {
+    get_players_filter_alignment(req, res, next, ['Ally'], true)
+};
+
+exports.api_get_enemies = function (req, res, next) {
+    get_players_filter_alignment(req, res, next, ['Enemy'], true)
+};
+
+// Display detail page.
+exports.player_detail = function (req, res, next) {
+    async.parallel({
+        player: function (callback) {
+            Player.findById(req.params.id).populate('tribe')
+                .exec(callback)
+        }
+    }, function (err, results) {
+        if (err) { return next(err); } // Error in API usage.
+        if (results.player == null) { // No results.
+            var err = new Error('Player not found');
+            err.status = 404;
+            return next(err);
+        }
+        // Successful, so render.
+        res.render('player_details', { title: 'Player Detail', player: results.player });
+    });
 };
 
 // Display Players create form on GET.
@@ -53,7 +132,7 @@ exports.player_create_get = function (req, res, next) {
     }, function (err, results) {
         if (err) { return next(err); }
         res.render('player_form', { title: 'Create Player', tribes: results.tribes });
-    });  
+    });
 };
 
 // Handle Players create on POST.
@@ -68,7 +147,6 @@ exports.player_create_post = [
     (req, res, next) => {
         // Extract the validation errors from a request.
         const errors = validationResult(req);
-        console.log(req.body)
         // Create Players object with escaped and trimmed data
         var player = new Player(
             {
@@ -79,7 +157,8 @@ exports.player_create_post = [
                 notes: req.body.notes,
             }
         );
-        console.log(player)
+
+
         if (!errors.isEmpty()) {
             // Get all tribes
             async.parallel({
@@ -89,23 +168,37 @@ exports.player_create_post = [
             }, function (err, results) {
                 if (err) { return next(err); }
                 res.render('player_form', { title: 'Create Player', tribes: results.tribes, player: player, errors: errors.array() });
-            });            
+            });
             return;
         }
         else {
-            console.log(player)
             // Data from form is valid.
-            // Save Players.
-            player.save(function (err) {
-                if (err) { return next(err); }
-                console.log('redirecting')
-                // Successful - redirect to new Players record.
-                res.redirect(player.url);
-            });
+            // Check if Alignment with same name already exists.
+            Player.findOne({ 'battlemetrics_id': req.body.battlemetrics_id })
+                .exec(function (err, found_player) {
+                    if (err) { return next(err); }
+
+                    if (found_player) {
+                        // exists, redirect to its detail page.
+                        res.redirect(found_player.url);
+                    }
+                    else {
+
+                        // Data from form is valid.
+                        // Save Players.
+                        player.save(function (err) {
+                            if (err) { return next(err); }
+                            console.log('redirecting')
+                            // Successful - redirect to new Players record.
+                            res.redirect(player.url);
+                        });
+
+                    }
+
+                });
         }
     }
 ];
-
 // Display Players delete form on GET.
 exports.player_delete_get = function (req, res, next) {
 
@@ -119,7 +212,7 @@ exports.player_delete_get = function (req, res, next) {
             res.redirect('/catalog/player');
         }
         // Successful, so render.
-        res.render('player_delete', { title: 'Delete Player', player: results.player});
+        res.render('player_delete', { title: 'Delete Player', player: results.player });
     });
 
 };
@@ -207,7 +300,7 @@ exports.player_update_post = [
             }, function (err, results) {
                 if (err) { return next(err); }
 
-         
+
                 res.render('player_form', { title: 'Update Player', tribes: results.tribes, player, errors: errors.array() });
             });
             return;

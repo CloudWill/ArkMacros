@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 
 var PlayerSchema = new Schema({
     steam_name: { type: String, required: true },
-    tribe: { type: Schema.ObjectId, ref: 'Tribe', required: true },
+    tribe: { type: [Schema.ObjectId], ref: 'Tribe', required: true },
     ign: { type: String},
     battlemetrics_id: { type: String },
     notes: { type: String }

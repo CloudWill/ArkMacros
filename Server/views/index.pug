@@ -1,43 +1,26 @@
 extends layout
 
 block content
-  h1= title
-  p Ark App - A developer was bored and decided to automate certain manual tasks in Ark: Survival Evolved
+    h1= title
 
-  h1 How to use this web application
-  br
-  br
-  h2 For tracking a new user
-  br
-  |1. Ideally the player should be online. The player's steam name (not in game name) can be anything but "123"
-  br
-  |2. Go to battlemetrics.com and search for the server the player is currently on
-  br
-  |3. Click on the online player you want to track under "Active Player"
-  br
-  |4. On the url you should see something like https://www.battlemetrics.com/players/1003883094 . We want the numbers (1003883094)
-  br
-  |5.Select the link "Create new player" on the left
-  br
-  |6.Enter the information required. You can leave the ign blank
+    h3 Usage information
+
+    pre #{help}
   
-  
-  
-  click the "create new player link" 
-  | b. 
+    br
 
-  br
-  br
-  br
-  if error
-    p Error getting dynamic content.
-  else
+    if error
+        p Error getting dynamic content.
+    else
 
-    p Current record counts:
+        p Current record counts:
 
-    ul
-      li #[strong Players:] !{data.player_count}
-      li #[strong Servers:] !{data.server_count}
-      li #[strong Tribes:] !{data.tribe_count}
-      li #[strong Alignments:] !{data.alignment_count}
-      li #[strong Server Clusters:] !{data.servercluster_count}
+        ul
+            li #[strong Players:] !{data.player_count}
+            li #[strong Servers:] !{data.server_count}
+            li #[strong Tribes:] !{data.tribe_count}
+            li #[strong Alignments:] !{data.alignment_count}
+            li #[strong Server Clusters:] !{data.servercluster_count}
+
+
+

@@ -7,13 +7,14 @@ block content
       label(for='steam_name') Steam Name:
       input#steam_name.form-control(type='text', placeholder='Steam Name' name='steam_name' required='true' value=(undefined===player ? '' : player.steam_name) )
     div.form-group
-      label(for='tribe') Tribe:
-      select#tribe.form-control(type='select', placeholder='Select tribe' name='tribe' required='true' )
+        label Tribe:
+        div
         for tribe in tribes
-          if player
-            option(value=tribe._id selected=(tribe._id.toString()===player.tribe._id.toString() ? 'selected' : false) ) #{tribe.name}
-          else
-            option(value=tribe._id) #{tribe.name}
+            div(style='display: inline; padding-right:10px;')
+            input.checkbox-input(type='checkbox', name='tribe', id=tribe._id, value=tribe._id, checked=tribe.checked )
+            label(for=tribe._id) #{tribe.tribe_name}
+    div.form-group
+ 
       label(for='ign') ign:
       input#ign.form-control(type='text', placeholder='In Game Name' name='ign' value=(undefined===player ? '' : player.ign))
     div.form-group

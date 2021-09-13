@@ -7,6 +7,7 @@ block content
         tr
             th Tribe Name
             th Alignments
+            th Servers
             th Server Cluster
         each tribe in tribe_list
             tr 
@@ -17,6 +18,11 @@ block content
                     if (val > 0)
                         |,   
                     a(href=align.url) #{align.alignment_name} 
+            th
+                each server, val in tribe.server
+                    if (val > 0)
+                        |,   
+                    a(href=server.url) #{server.server_name} 
             th 
                 each cluster, val in tribe.servercluster
                     if (val > 0)

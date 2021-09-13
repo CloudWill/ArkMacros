@@ -3,6 +3,9 @@ var async = require('async')
 var Player = require('../models/player')
 var Alignment = require('../models/alignment')
 var Servercluster = require('../models/servercluster')
+var Server = require('../models/server')
+var Helper = require ('../utility/helperfunctions')
+
 
 const { body, validationResult } = require("express-validator");
 
@@ -10,7 +13,7 @@ const { body, validationResult } = require("express-validator");
 exports.tribe_list = function (req, res, next) {
 
     Tribe.find()
-        .populate('alignment servercluster')
+        .populate('alignment servercluster server')
         .sort([['tribe_name', 'ascending']])
         .exec(function (err, list_tribes) {
             if (err) { return next(err); }
@@ -25,7 +28,7 @@ exports.tribe_detail = function (req, res, next) {
 
     async.parallel({
         tribe: function (callback) {
-            Tribe.findById(req.params.id).populate('alignment servercluster')
+            Tribe.findById(req.params.id).populate('alignment servercluster server')
                 .exec(callback)
         },
         tribes_players: function (callback) {
@@ -56,43 +59,29 @@ exports.tribe_create_get = function (req, res, next) {
         serverclusters: function (callback) {
             Servercluster.find(callback);
         },
+        servers: function (callback) {
+            Server.find(callback);
+        },
     }, function (err, results) {
         if (err) { return next(err); }
-        res.render('tribe_form', { title: 'Create Tribe', alignments: results.alignments, serverclusters: results.serverclusters});
+        res.render('tribe_form', { title: 'Create Tribe', alignments: results.alignments, serverclusters: results.serverclusters, servers: results.servers});
     });    
 };
 
 // Handle create on POST.
 exports.tribe_create_post = [
-
-    // Convertto an array.
     (req, res, next) => {
-        if (!(req.body.alignment instanceof Array)) {
-            if (typeof req.body.alignment === 'undefined') {
-                req.body.alignment = [];
-            }
-            else {
-                req.body.alignment = new Array(req.body.alignment);
-            }
-        }
-        next();
-    },
-    // Convert to an array.
-    (req, res, next) => {
-        if (!(req.body.servercluster instanceof Array)) {
-            if (typeof req.body.servercluster === 'undefined') {
-                req.body.servercluster = [];
-            }
-            else {
-                req.body.servercluster = new Array(req.body.servercluster);
-            }
-        }
+        // Convert to an array.
+        req.body.alignment = Helper.convert_to_array(req.body.alignment);
+        req.body.servercluster = Helper.convert_to_array(req.body.servercluster);
+        req.body.server = Helper.convert_to_array(req.body.server);
         next();
     },
 
     // Validate and sanitize fields.
     body('tribe_name').trim().isLength({ min: 1 }).escape().withMessage('Tribe name must be specified.'),
     body('alignment.*').escape(),
+    body('server.*').escape(),
     body('servercluster.*').escape(),
     // Process request after validation and sanitization.
     (req, res, next) => {
@@ -106,6 +95,7 @@ exports.tribe_create_post = [
                 tribe_name: req.body.tribe_name,
                 alignment: req.body.alignment,
                 servercluster: req.body.servercluster,
+                server: req.body.server,
             }
         );
         if (!errors.isEmpty()) {
@@ -117,22 +107,18 @@ exports.tribe_create_post = [
                 serverclusters: function (callback) {
                     Servercluster.find(callback);
                 },
+                servers: function (callback) {
+                    Server.find(callback);
+                },
             }, function (err, results) {
                 if (err) { return next(err); }
                 // Mark our selected as checked.
-                for (let i = 0; i < results.alignments.length; i++) {
-                    if (tribe.alignment.indexOf(results.alignments[i]._id) > -1) {
-                        results.alignments[i].checked = 'true';
-                    }
-                }
-                // Mark our selected as checked.
-                for (let i = 0; i < results.serverclusters.length; i++) {
-                    if (tribe.servercluster.indexOf(results.serverclusters[i]._id) > -1) {
-                        results.serverclusters[i].checked = 'true';
-                    }
-                }
+                results.alignments = Helper.error_mark_as_checked(results.alignments, tribe.alignment);
+                results.alignments = Helper.error_mark_as_checked(results.serverclusters, tribe.servercluster);
+                results.alignments = Helper.error_mark_as_checked(results.servers, tribe.server);
+
                 // There are errors. Render form again with sanitized values/errors messages.
-                res.render('tribe_form', { title: 'Create Tribe', tribe: results.tribe, alignments: results.alignment, serverclusters: results.serverclusters, errors: errors.array() });
+                res.render('tribe_form', { title: 'Create Tribe', tribe: results.tribe, alignments: results.alignment, serverclusters: results.serverclusters, servers: results.servers, errors: errors.array() });
             });
             return;
         }
@@ -213,6 +199,9 @@ exports.tribe_update_get = function (req, res, next) {
         serverclusters: function (callback) {
             Servercluster.find(callback);
         },
+        servers: function (callback) {
+            Server.find(callback);
+        },
     }, function (err, results) {
         if (err) { return next(err); }
         if (results.tribe == null) { // No results.
@@ -221,22 +210,12 @@ exports.tribe_update_get = function (req, res, next) {
             return next(err);
         }
         // Success.
-        // Mark our selectedas checked.
-        for (var all_iter = 0; all_iter < results.alignments.length; all_iter++) {
-            for (var tribe_iter = 0; tribe_iter < results.tribe.alignment.length; tribe_iter++) {
-                if (results.alignments[all_iter]._id.toString() === results.tribe.alignment[tribe_iter]._id.toString()) {
-                    results.alignments[all_iter].checked = 'true';
-                }
-            }
-        }
-        for (var all_iter = 0; all_iter < results.serverclusters.length; all_iter++) {
-            for (var tribe_iter = 0; tribe_iter < results.tribe.servercluster.length; tribe_iter++) {
-                if (results.serverclusters[all_iter]._id.toString() === results.tribe.servercluster[tribe_iter]._id.toString()) {
-                    results.serverclusters[all_iter].checked = 'true';
-                }
-            }
-        }
-        res.render('tribe_form', { title: 'Update Tribe', tribe: results.tribe, alignments: results.alignments, serverclusters: results.serverclusters });
+        // Mark our selected as checked.
+        results.alignments = Helper.mark_as_checked(results.alignments, results.tribe.alignment);
+        results.serverclusters = Helper.mark_as_checked(results.serverclusters, results.tribe.servercluster);
+        results.servers = Helper.mark_as_checked(results.servers, results.tribe.server);
+        
+        res.render('tribe_form', { title: 'Update Tribe', tribe: results.tribe, alignments: results.alignments, serverclusters: results.serverclusters, servers: results.servers });
     });
 };
 
@@ -245,37 +224,39 @@ exports.tribe_update_post = [
 
     // Validate and santize fields.
     body('tribe_name').trim().isLength({ min: 1 }).escape().withMessage('Tribe name must be specified.'),
-    body('alignment.*').escape(),
-    body('servercluster.*').escape(),
+        body('alignment.*').escape(),
+        body('servercluster.*').escape(),
+        body('server.*').escape(),
 
-    // Process request after validation and sanitization.
-    (req, res, next) => {
+        // Process request after validation and sanitization.
+        (req, res, next) => {
 
-        // Extract the validation errors from a request.
-        const errors = validationResult(req);
+            // Extract the validation errors from a request.
+            const errors = validationResult(req);
 
-        // Create object with escaped and trimmed data (and the old id!)
-        var tribe = new Tribe(
-            {
-                tribe_name: req.body.tribe_name,
-                alignment: req.body.alignment,
-                servercluster: req.body.servercluster,
-                _id: req.params.id
+            // Create object with escaped and trimmed data (and the old id!)
+            var tribe = new Tribe(
+                {
+                    tribe_name: req.body.tribe_name,
+                    alignment: req.body.alignment,
+                    servercluster: req.body.servercluster,
+                    server: req.body.server,
+                    _id: req.params.id
+                }
+            );
+
+            if (!errors.isEmpty()) {
+                // There are errors. Render the form again with sanitized values and error messages.
+                res.render('tribe_form', { title: 'Update Tribe', tribe: tribe, errors: errors.array() });
+                return;
             }
-        );
-
-        if (!errors.isEmpty()) {
-            // There are errors. Render the form again with sanitized values and error messages.
-            res.render('tribe_form', { title: 'Update Tribe', tribe: tribe, errors: errors.array() });
-            return;
+            else {
+                // Data from form is valid. Update the record.
+                Tribe.findByIdAndUpdate(req.params.id, tribe, {}, function (err, thetribe) {
+                    if (err) { return next(err); }
+                    // Successful - redirect to genre detail page.
+                    res.redirect(thetribe.url);
+                });
+            }
         }
-        else {
-            // Data from form is valid. Update the record.
-            Tribe.findByIdAndUpdate(req.params.id, tribe, {}, function (err, thetribe) {
-                if (err) { return next(err); }
-                // Successful - redirect to genre detail page.
-                res.redirect(thetribe.url);
-            });
-        }
-    }
 ];

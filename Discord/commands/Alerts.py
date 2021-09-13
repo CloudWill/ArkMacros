@@ -64,11 +64,12 @@ class Alerts():
                     msg = f'{ign} is currently online at {server_name} --- Notes: {notes}\n'
                     msgs.append(msg)
             elif r.status_code == 429:
-                msg = f'Limit exceeded. Please try again in 2 minutes\n'
+                msg = f'Error {r.status_code}: API Limit Exceeded. Please try again in 5 minutes\n'
                 msgs.append(msg)
                 return msgs
             else:
-                discord_log(f'{steam_name} | api {url} gave the response {r}\n {r.json()}')
+                discord_log(f'Error {r.status_code} for {steam_name}. Please try again in 5 minutes')
+                msgs.append(msg)
         return msgs
 
     #gets the count of total non-allies or 123 players in the server

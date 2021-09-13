@@ -26,7 +26,17 @@ exports.index = function (req, res) {
         server_count: function (callback) {
             Server.countDocuments({}, callback);
         },
-    }, function (err, results) {
-        res.render('index', { title: 'Ark App Home', error: err, data: results });
+    },
+        function (err, results) {
+
+
+            var fs = require('fs')
+            fs.readFile('help.txt', 'utf8', function (err, help) {
+                if (err) throw err;
+                res.render('index', { title: 'Ark App Home', error: err, data: results, help: help });
+            });
+
+
+        
     });
 };

@@ -18,12 +18,15 @@ class GetPlayerCount():
         r = requests.get(url)
         # gets result code
         discord_log(f'get_player_count server {serverid} result code {r}')
-        jsonObject = r.json()
+        if r.status_code == 200:
+            jsonObject = r.json()
 
-        data = jsonObject["data"]
-        playerCount = data['attributes']['players']
-        server = data['attributes']['details']['map']
-        return playerCount
+            data = jsonObject["data"]
+            playerCount = data['attributes']['players']
+            server = data['attributes']['details']['map']
+            return playerCount
+        discord_log(f'returning -1')
+        return -1
 
     def parse_message(self, val):
         #gets the servers to check playercount

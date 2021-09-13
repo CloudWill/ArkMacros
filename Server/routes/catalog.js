@@ -16,12 +16,6 @@ var servercluster_controller = require('../controllers/serverclusterController')
 // GET catalog home page.
 router.get('/', index_controller.index);
 
-
-/// ALLY ROUTES ///
-
-
-
-
 /// PLAYER ROUTES ///
 
 // GET request for creating. NOTE This must come before route for id (i.e. display ).
@@ -142,7 +136,6 @@ router.get('/serverclusters', servercluster_controller.servercluster_list);
 // APIs
 router.get('/api/get_ally_players', player_controller.api_get_allies);
 router.get('/api/get_enemy_players', player_controller.api_get_enemies);
-
-router.get('/servers/api', server_controller.server_api_get);
+router.get('/api/get_servers', server_controller.server_api_get);
 
 module.exports = router;

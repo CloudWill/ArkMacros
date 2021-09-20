@@ -34,13 +34,16 @@ function get_players_filter_alignment(req, res, next, val, api) {
                 foreignField: "_id",
                 as: "serverclusters"
             }
-        },
-
-        { $match: { "alignments.alignment_name": { $in: val } } },
-        { $sort: { "steam_name": 1 } }
+        }       
 
 
         ];
+    //only filter if exists
+    if (!val.includes('All')) {
+        filter.push({ $match: { "alignments.alignment_name": { $in: val } } })
+    }
+    filter.push({ $sort: { "steam_name": 1} })
+
     Player.aggregate(filter)
         .exec(function (err, list_players) {
             if (err) { return next(err) }
@@ -78,7 +81,7 @@ exports.player_detail = function (req, res, next) {
 
 // Display lists
 exports.player_list = function (req, res, next) {
-    get_players_filter_alignment(req, res, next, ['Ally', 'Enemy', 'Neutral'], false)
+    get_players_filter_alignment(req, res, next, ['All'], false)
 };
 
 exports.ally_list = function (req, res, next) {
@@ -93,15 +96,6 @@ exports.enemy_list = function (req, res, next) {
     get_players_filter_alignment(req, res, next, ['Enemy'], false)
 };
 
-
-// APIs for lists
-exports.api_get_allies = function (req, res, next) {
-    get_players_filter_alignment(req, res, next, ['Ally'], true)
-};
-
-exports.api_get_enemies = function (req, res, next) {
-    get_players_filter_alignment(req, res, next, ['Enemy'], true)
-};
 
 // Display detail page.
 exports.player_detail = function (req, res, next) {
@@ -327,3 +321,17 @@ exports.player_update_post = [
         }
     }
 ];
+
+
+// APIs for lists
+exports.api_get_allies = function (req, res, next) {
+    get_players_filter_alignment(req, res, next, ['Ally'], true)
+};
+
+exports.api_get_enemies = function (req, res, next) {
+    get_players_filter_alignment(req, res, next, ['Enemy'], true)
+};
+
+exports.api_get_all = function (req, res, next) {
+    get_players_filter_alignment(req, res, next, ['All'], true)
+};

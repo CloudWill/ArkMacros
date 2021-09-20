@@ -25,11 +25,11 @@ exports.error_mark_as_checked = function (attributes, attribute) {
 exports.convert_to_array = function (toConvert) {
 
     if (!(toConvert instanceof Array)) {
-        if (typeof req.body.server === 'undefined') {
+        if (typeof toConvert === 'undefined') {
             toConvert = [];
         }
         else {
-            toConvert = new Array(req.body.server);
+            toConvert = new Array(toConvert);
         }
     }
     return toConvert;

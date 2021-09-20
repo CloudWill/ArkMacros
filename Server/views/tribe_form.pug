@@ -15,19 +15,20 @@ block content
                 input.checkbox-input(type='checkbox', name='alignment', id=alignment._id, value=alignment._id, checked=alignment.checked )
                 label(for=alignment._id) #{alignment.alignment_name}
         div.form-group
-            label Server:
-            div
-            for server in servers
-                div(style='display: inline; padding-right:10px;')
-                input.checkbox-input(type='checkbox', name='server', id=server._id, value=server._id, checked=server.checked )
-                label(for=server._id) #{server.server_name}
-        div.form-group
             label Server Clusters:
             div
             for servercluster in serverclusters
                 div(style='display: inline; padding-right:10px;')
                 input.checkbox-input(type='checkbox', name='servercluster', id=servercluster._id, value=servercluster._id, checked=servercluster.checked )
                 label(for=servercluster._id) #{servercluster.servercluster_name}
+        div.form-group
+            label Servers:
+            div
+            for server in servers
+                div(style='display: inline; padding-right:10px;')
+                input.checkbox-input(type='checkbox', name='server', id=server._id, value=server._id, checked=server.checked )
+                label(for=server._id) #{server.server_name} 
+                br
         button.btn.btn-primary(type='submit') Submit
 
     if errors 

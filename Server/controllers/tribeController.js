@@ -60,7 +60,7 @@ exports.tribe_create_get = function (req, res, next) {
             Servercluster.find(callback);
         },
         servers: function (callback) {
-            Server.find(callback);
+            Server.find(callback).sort([['server_name', 'ascending']]);
         },
     }, function (err, results) {
         if (err) { return next(err); }
@@ -200,7 +200,7 @@ exports.tribe_update_get = function (req, res, next) {
             Servercluster.find(callback);
         },
         servers: function (callback) {
-            Server.find(callback);
+            Server.find(callback).sort([['server_name', 'ascending']]);
         },
     }, function (err, results) {
         if (err) { return next(err); }

@@ -10,6 +10,7 @@ var player_controller = require('../controllers/playerController');
 var tribe_controller = require('../controllers/tribeController');
 var alignment_controller = require('../controllers/alignmentController');
 var servercluster_controller = require('../controllers/serverclusterController');
+var tribelog_controller = require('../controllers/tribelogController');
 
 /// ROUTES ///
 
@@ -135,7 +136,11 @@ router.get('/serverclusters', servercluster_controller.servercluster_list);
 
 // APIs
 router.get('/api/get_ally_players', player_controller.api_get_allies);
+router.get('/api/get_all_players', player_controller.api_get_all);
 router.get('/api/get_enemy_players', player_controller.api_get_enemies);
 router.get('/api/get_servers', server_controller.server_api_get);
+router.post('/api/files/send_tribe_image', tribelog_controller.tribelog_upload_tribe_log_post);
+router.get("/api/files", tribelog_controller.tribelog_get_file_list)
+router.get("/api/files/:name", tribelog_controller.tribelog_download_files)
 
 module.exports = router;

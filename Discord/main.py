@@ -1,115 +1,154 @@
+import asyncio
 import os
-import discord
+import traceback
+from datetime import datetime
+from helpers.Logging import Logging
+from models.Settings import Settings
 from discord.ext import commands
 from discord.ext import tasks
-from dotenv import load_dotenv
-from commands.GetPlayerCount import GetPlayerCount
-from commands.Alerts import Alerts
-import requests
-import time
+from Battlemetrics.PlayerCount import PlayerCount
+from Battlemetrics.OnlinePlayers import OnlinePlayers
+from helpers.Helpers import Helpers
+from models.Servers import Servers
+from models.Players import Players
+from ArkData.PlayersController import PlayerController
 
-load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
 
-guild_id = os.getenv('DISCORD_GUILD')
-channel_id = os.getenv('DISCORD_TRIBE_MSG_CHANNEL_ID')
+async def get_alert(val, auto):
+    val = val.lower()
+
+    msgs = []
+
+    online_allies = online_players.get_online_allies(val)
+    online_enemies = online_players.get_online_enemies(val)
+
+    server = helpers.get_server(val)
+    total_player_count = player_count.get_player_count(server.server_id)
+    non_allies_count = total_player_count - len(online_allies)
+
+    msg = f"{server.server_name} | {total_player_count} total online players. {non_allies_count} of them are either non-allies or '123'"
+    msgs.append(msg)
+
+    msg = 'ALLIES'
+    msgs.append(msg)
+
+    for msg in online_allies:
+        msgs.append(msg)
+
+    msg = 'ENEMIES'
+    msgs.append(msg)
+    for msg in online_enemies:
+        msgs.append(msg)
+
+    # only send a message in the auto alerts if a threshold is met
+    if auto:
+        offline_time_start = int(settings.config['OFFLINE_TIME_START'])
+        offline_time_end = int(settings.config['OFFLINE_TIME_END'])
+        # sends an auto message if more than x people are online based on thresold
+        alert_threshold = int(settings.config['ALERT_THRESHOLD_ONLINE_TIMER'])
+
+        now = datetime.now()
+        current_hour = int(now.strftime("%H"))
+
+        between = offline_time_start <= current_hour <= offline_time_end
+        # offline timer, less people on to notify
+        if between:
+            alert_threshold = int(os.getenv('ALERT_THRESHOLD_OFFLINE_TIMER'))
+        logging.log_info(f'Current threshold is: {alert_threshold}')
+        if non_allies_count >= alert_threshold:
+            msgs.insert(0, 'AUTO MESSAGE')
+            return msgs
+        else:
+            return []
+    return msgs
+
 
 bot = commands.Bot(command_prefix='!')
-@bot.command(name='playercount', help = '''sends a message about the total players in a server\n' \
+
+@bot.command(name='playercount', help='''Responds with the total players in a server\n' \
 [filter] can be a specific server(s) or it can can have the flag [all] to get all the people for all servers.\n'\
 The current servers are [Valguero, TheCenter, ScorchedEarth, CrystalIsles, Aberration, Extinction, Ragnarok, Genone, TheIsland, GenTwo]''')
 async def player_count(ctx, val):
     val = val.lower()
-    player_count = GetPlayerCount()
-    msg = player_count.parse_message(val)
-    await ctx.send(msg)
+    msgs = helpers.discord_msg(player_count.filter_server(val))
+    for msg in msgs:
+        await ctx.send(msg)
 
-@bot.command(name='allies', help = '''The list of the current allies that's not named '123' that we don't need to track''')
+
+@bot.command(name='allies', help=''' Responds with the list of allies not named '123' ''')
 async def player_count(ctx):
-    alerts = Alerts()
-    await ctx.send(alerts.get_allies())
+    msgs = helpers.discord_msg(player_controller.get_allies_info())
+    for msg in msgs:
+        await ctx.send(msg)
 
-@bot.command(name='enemies', help = '''The list of the current enemies that's not named '123' that we need to track''')
+
+@bot.command(name='enemies', help=''' Responds with the list of enemies not named '123' ''')
 async def player_count(ctx):
-    alerts = Alerts()
-    await ctx.send(alerts.get_enemies())
+    msgs = helpers.discord_msg(player_controller.get_enemies_info())
+    for msg in msgs:
+        await ctx.send(msg)
 
-@bot.command(name='cloudnudes', help = '''special request from crew''')
-async def player_count(ctx):
-    await ctx.send('<https://www.youtube.com/watch?v=dQw4w9WgXcQ>')
 
-@bot.command(name='alert', help = '''gives a message about how many non-friendly members or "123" are on a given server \n' \
+@bot.command(name='alert', help='''Responds with how many non-ally or "123" are on a given server \n' \
 [filter] has to be a specific server\n'\
 The current servers are [Valguero, TheCenter, ScorchedEarth, CrystalIsles, Aberration, Extinction, Ragnarok, Genone, TheIsland, GenTwo]''')
 async def alert_discord(ctx, val):
-    val = val.lower()
-    # servers to track
-    load_dotenv()
-    server_url = os.getenv('SERVERS_API')
-    url_allies = os.getenv('ALLY_MEMBERS_API')
-    url_enemies = os.getenv('ENEMY_MEMBERS_API')
+    msgs = await get_alert(val, False)
+    filtered_msgs = helpers.discord_msg(msgs)
+    for msg in filtered_msgs:
+        await ctx.send(msg)
 
-    alerts = Alerts()
-    val = val.lower()
-    r = requests.get(server_url)
-    servers = r.json()
-    val_found = False
-
-    #finds the server to query
-    for x in servers:
-        server_name = x['server_name']
-        server_id = x['server_id']
-        if server_name == val:
-            # gets the total players
-            pc = GetPlayerCount()
-            online_players = pc.get_player_count(server_id)
-
-            #sends the non-friendlys count msg
-            non_allies = alerts.non_allies_online_count(url_allies, server_name, server_id, online_players)
-            msg = f"{server_name} | {online_players} total online players. {non_allies} of them are either non-allies or '123'"
-
-            # see if enemy is only at a specific server
-            enemies_online = alerts.get_online_info(url_enemies, server_name, server_id)
-            if len(enemies_online) > 4:
-                msg = f'{msg}\n{enemies_online}'
-            else:
-                msg = f'{msg}\n | There are no known enemies online on this server'
-            val_found = True
-            await ctx.send(f"{msg}")
-            break
-    if not val_found:
-        await ctx.send(f'Your input [{val}] was invalid for !alert. Please try again or get help with !help')
 
 @tasks.loop(minutes=60)
-async def raid_alert_valg(server_name, server_id, alert_threshold):
+async def raid_alert_valg(val):
     await bot.wait_until_ready()
-    load_dotenv()
-    channel_id = os.getenv('DISCORD_TRIBE_MSG_CHANNEL_ID')
+    channel_id = settings.config["DISCORD_TRIBE_MSG_CHANNEL_ID"]
     channel = bot.get_channel(int(channel_id))
-    # gets the players that we don't need to track:
-    url_allies = os.getenv('ALLY_MEMBERS_API')
-    url_enemies = os.getenv('ENEMY_MEMBERS_API')
 
-    #gets the total players
-    pc = GetPlayerCount()
-    online_players = pc.get_player_count(server_id)
+    msgs = await get_alert(val, True)
+    # only send messages if the threshold is met
+    print(len(msgs))
+    if len(msgs) != 0:
+        filtered_msgs = helpers.discord_msg(msgs)
+        for msg in filtered_msgs:
+            await channel.send(msg)
 
-    #gets the total non friendly players
-    alerts = Alerts()
-    non_allies = alerts.non_allies_online_count(url_allies, server_name, server_id, online_players)
-    msg = ""
-    if non_allies > alert_threshold:
-        online_msg = f"Auto message | {server_name} | {online_players} total online players. {non_allies} of them are either non-allies or '123'"
-        msg = f'{msg}{online_msg}\n'
-    #see if enemy is only at a specific server
-    enemies_online = alerts.get_online_info(url_enemies, server_name, server_id)
-    if len(enemies_online) > 4:
-        msg = f'{msg} {enemies_online}\n'
-    if len(msg) > 0:
-        await channel.send(msg)
 
-# sends an auto message if more than x people are online based on thresold
-alert_threshold = int(os.getenv('DISCORD_ALERT_THRESHOLD'))
+# initialize logging
+data = {}
+logging = Logging()
+data.update({'logging': logging})
 
-raid_alert_valg.start('Valguero', 7256984, alert_threshold)
-bot.run(TOKEN)
+settings = Settings()
+
+data.update({'settings': settings})
+sleep_time = 10
+
+while True:
+
+    try:
+        # starting time for script
+        current_time = datetime.now()
+
+        # gets the latest data
+        servers = Servers(settings)
+        data.update({'servers': servers})
+
+        helpers = Helpers(data)
+        data.update({"helpers": helpers})
+
+        players = Players(data)
+        data.update({'players': players})
+
+
+        online_players = OnlinePlayers(data)
+        player_count = PlayerCount(data)
+
+        player_controller = PlayerController(data)
+
+        raid_alert_valg.start('Valguero')
+        bot.run(settings.config["DISCORD_TOKEN"])
+
+    except Exception:
+        logging.log_info(f'ERROR: {traceback.print_exc}')
+        asyncio.create_task(bot.close())

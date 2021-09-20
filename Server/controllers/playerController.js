@@ -1,6 +1,7 @@
 var Player = require('../models/player')
 var Tribe = require('../models/tribe')
 var async = require('async')
+var Helper = require('../utility/helperfunctions')
 
 const { body, validationResult } = require("express-validator");
 
@@ -24,7 +25,7 @@ function get_players_filter_alignment(req, res, next, val, api) {
                 foreignField: "_id",
                 as: "alignments"
             }
-            },
+        },
         {
             $lookup:
             {
@@ -33,14 +34,17 @@ function get_players_filter_alignment(req, res, next, val, api) {
                 foreignField: "_id",
                 as: "serverclusters"
             }
-            },
-
-            { $match: { "alignments.alignment_name": { $in: val } } },
-            { $sort: { "steam_name": 1} }
+        }       
 
 
-            ];
-            Player.aggregate(filter)
+        ];
+    //only filter if exists
+    if (!val.includes('All')) {
+        filter.push({ $match: { "alignments.alignment_name": { $in: val } } })
+    }
+    filter.push({ $sort: { "steam_name": 1} })
+
+    Player.aggregate(filter)
         .exec(function (err, list_players) {
             if (err) { return next(err) }
             else {
@@ -77,7 +81,7 @@ exports.player_detail = function (req, res, next) {
 
 // Display lists
 exports.player_list = function (req, res, next) {
-    get_players_filter_alignment(req, res, next, ['Ally', 'Enemy', 'Neutral'], false)
+    get_players_filter_alignment(req, res, next, ['All'], false)
 };
 
 exports.ally_list = function (req, res, next) {
@@ -92,15 +96,6 @@ exports.enemy_list = function (req, res, next) {
     get_players_filter_alignment(req, res, next, ['Enemy'], false)
 };
 
-
-// APIs for lists
-exports.api_get_allies = function (req, res, next) {
-    get_players_filter_alignment(req, res, next, ['Ally'], true)
-};
-
-exports.api_get_enemies = function (req, res, next) {
-    get_players_filter_alignment(req, res, next, ['Enemy'], true)
-};
 
 // Display detail page.
 exports.player_detail = function (req, res, next) {
@@ -137,9 +132,16 @@ exports.player_create_get = function (req, res, next) {
 
 // Handle Players create on POST.
 exports.player_create_post = [
+
+    (req, res, next) => {
+        // Convert to an array.
+        req.body.tribe = Helper.convert_to_array(req.body.tribe);
+        next();
+    },
+
     // Validate and sanitize fields.
     body('steam_name').trim().isLength({ min: 1 }).escape().withMessage('steam name must be specified.'),
-    body('tribe', 'Tribe must not be empty.').trim().isLength({ min: 1 }).escape(),
+    body('tribe.*').escape(),
     body('ign').trim(),
     body('battlemetrics_id', 'Invalid numeric entry').optional({ checkFalsy: true }).isNumeric(),
     body('notes', 'invalid note entry').optional({ checkFalsy: true }),
@@ -167,6 +169,8 @@ exports.player_create_post = [
                 }
             }, function (err, results) {
                 if (err) { return next(err); }
+                // Mark our selected as checked.
+                results.tribes = Helper.error_mark_as_checked(results.tribes, player.alignment);
                 res.render('player_form', { title: 'Create Player', tribes: results.tribes, player: player, errors: errors.array() });
             });
             return;
@@ -256,6 +260,8 @@ exports.player_update_get = function (req, res, next) {
             return next(err);
         }
         // Success.
+        // Mark our selected as checked.
+        results.tribes = Helper.mark_as_checked(results.tribes, results.player.tribe);
         res.render('player_form', { title: 'Update Player', tribes: results.tribes, player: results.player });
     });
 };
@@ -265,7 +271,7 @@ exports.player_update_post = [
 
     // Validate and santize fields.
     body('steam_name').trim().isLength({ min: 1 }).escape().withMessage('steam name must be specified.'),
-    body('tribe', 'Tribe must not be empty.').trim().isLength({ min: 1 }).escape(),
+    body('tribe.*').escape(),
     body('ign').trim(),
     body('battlemetrics_id', 'Invalid numeric entry').optional({ checkFalsy: true }).isNumeric(),
     body('notes', 'invalid note entry').optional({ checkFalsy: true }),
@@ -316,14 +322,16 @@ exports.player_update_post = [
     }
 ];
 
-// API
-exports.player_api_get = function (req, res, next) {
 
-    Player.find()
-        .sort([['steam_name', 'ascending']])
-        .exec(function (err, list_players) {
-            if (err) { return next(err); }
-            // Successful, so render.
-            res.send(list_players);
-        })
+// APIs for lists
+exports.api_get_allies = function (req, res, next) {
+    get_players_filter_alignment(req, res, next, ['Ally'], true)
+};
+
+exports.api_get_enemies = function (req, res, next) {
+    get_players_filter_alignment(req, res, next, ['Enemy'], true)
+};
+
+exports.api_get_all = function (req, res, next) {
+    get_players_filter_alignment(req, res, next, ['All'], true)
 };

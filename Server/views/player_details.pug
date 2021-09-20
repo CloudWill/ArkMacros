@@ -2,31 +2,30 @@ extends layout
 
 block content
 
-  h1 Player Information
+    h1 Player Information
 
-  div(style='margin-left:20px;margin-top:20px')
-
+    div(style='margin-left:20px;margin-top:20px')
 
     h4 Player Information
+    br
+    h5 Steam Name: #{player.steam_name}
+    h5 In game name (ign): #{player.ign}
+    h5 Battlemetrics_id: #{player.battlemetrics_id}
+    h5 Notes: #{player.notes}
     
+    br
+    br
     table(style='width:100%', border='1')
-        
         tr
-            th steam name 
-            th in game name (ign)
-            th Tribe
-            th battlemetrics_id
-            th notes
-
+            th Tribes
+     
+        each tribe in player.tribe
             tr 
-            th #{player.steam_name}
-            th #{player.ign}
-            th #{player.tribe.tribe_name}
-            th #{player.battlemetrics_id}
-            th #{player.notes}
+                th
+                    a(href= tribe.url) #{tribe.tribe_name}  
       
-  hr
-  p
-    a(href=player.url+'/delete') Delete Player
-  p
-    a(href=player.url+'/update') Update Player
+    hr
+    p
+        a(href=player.url+'/delete') Delete Player
+    p
+        a(href=player.url+'/update') Update Player

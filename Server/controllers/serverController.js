@@ -218,6 +218,7 @@ exports.server_update_post = [
 exports.server_api_get = function (req, res, next) {
 
     Server.find()
+        .populate('servercluster')
         .sort([['server_name', 'ascending']])
         .exec(function (err, list_server) {
             if (err) { return next(err); }

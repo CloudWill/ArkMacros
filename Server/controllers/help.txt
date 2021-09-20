@@ -1,0 +1,32 @@
+    Discord Bot:
+    type '!help' to see all the commands and !help [command] for a more detailed description
+    
+    Currently there will be an automatic message to the channel _____ if one of the following is true:
+    - There is a known enemy online at Valguero
+    - There is more than 6 non-allies (or '123') online at Valguero between 6pm-1am PST
+    - There is more than 3 non-allies (or '123') online at Valguero between 1am-6am PST
+    
+    To use:
+    
+    alert       gives a message about how many non-friendly members or "123" ar...
+          - To Update the data, please go to :_________
+          - Responds in about 1minute due the free API limit from battlemetrics
+          - might get the error "Error 429: API Limit Exceeded...." This is due to the free API limit from battlemetrics
+    
+    allies      The list of the current allies that's not named '123' that we d...
+    enemies     The list of the current enemies that's not named '123' that we ...
+    help        Shows this message
+    playercount Responds with the total players in a server(s)
+      
+ 
+    For tracking a new user
+    1. Ideally the player should be online. The player's steam name (not in game name) can be anything but "123"
+    2. Go to battlemetrics.com and search for the server the player is currently on
+    3. Click on the online player you want to track under "Active Player"
+    4. On the url you should see something like https://www.battlemetrics.com/players/1003883094 . We want the numbers (1003883094)
+    5.Select the link "Create new player" on the left
+    6.Enter the information required. You can leave the ign blank.
+
+    Updates pending (for more updates to the bot or web server, message @CLoudWilliam#7223):
+     - Historical player count on webpage
+     - AutomaticDiscord notification when tribe log contains certain key words (destroyed, killed, etc)

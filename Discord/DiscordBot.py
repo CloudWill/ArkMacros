@@ -1,10 +1,11 @@
-import datetime
 import os
 import discord
 from dotenv import load_dotenv
 from discord.ext import tasks, commands
 import json
 import requests
+from datetime import datetime
+
 
 def Logging(msg):
     print(f'{datetime.datetime.now()} : {msg}')
@@ -68,12 +69,28 @@ async def RunTribeLogAlert():
 
 load_dotenv()
 
-TOKEN = os.getenv('DISCORD_TOKEN')
-client = discord.Client()
+offline_time_start = int(os.getenv('OFFLINE_TIME_START'))
+offline_time_end = int(os.getenv('OFFLINE_TIME_END'))
+
+now = datetime.now()
+
+current_time = now.strftime("%H:%M:%S")
+
+current_hour = int(now.strftime("%H"))
+
+between = offline_time_start <= current_hour <= offline_time_end
+
+print(f'current time: {current_time} \ncurrent hour:{current_hour}\n offline_start_hour{offline_time_start} \noffline_end {offline_time_end} \n between? {between}')
 
 
-RunTribeLogAlert.start()
 
-client.run(TOKEN)
+
+#TOKEN = os.getenv('DISCORD_TOKEN')
+#client = discord.Client()
+
+
+#RunTribeLogAlert.start()
+
+#client.run(TOKEN)
 
 

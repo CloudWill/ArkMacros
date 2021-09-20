@@ -18,6 +18,18 @@ block content
             td This tribe has not been assigned an alignment
     br
 
+    table(style='width:100%', border='1')
+        tr
+        th Servers
+        each val, index in tribe.server
+            tr 
+                th 
+                    a(href=val.url) #{val.server_name}
+        else
+            tr
+            td This tribe is not been assigned a server cluster
+
+    br
   
     table(style='width:100%', border='1')
         tr

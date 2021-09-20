@@ -6,14 +6,9 @@ block content
     div.form-group
       label(for='steam_name') Steam Name:
       input#steam_name.form-control(type='text', placeholder='Steam Name' name='steam_name' required='true' value=(undefined===player ? '' : player.steam_name) )
+
     div.form-group
-      label(for='tribe') Tribe:
-      select#tribe.form-control(type='select', placeholder='Select tribe' name='tribe' required='true' )
-        for tribe in tribes
-          if player
-            option(value=tribe._id selected=(tribe._id.toString()===player.tribe._id.toString() ? 'selected' : false) ) #{tribe.name}
-          else
-            option(value=tribe._id) #{tribe.name}
+ 
       label(for='ign') ign:
       input#ign.form-control(type='text', placeholder='In Game Name' name='ign' value=(undefined===player ? '' : player.ign))
     div.form-group
@@ -22,6 +17,14 @@ block content
     div.form-group
       label(for='notes') notes:
       input#ign.form-control(type='text', placeholder='notes' name='notes' value=(undefined===player ? '' : player.notes))
+    div.form-group
+        label Tribes:
+        div
+        for tribe in tribes
+            div(style='display: inline; padding-right:10px;')
+            input.checkbox-input(type='checkbox', name='tribe', id=tribe._id, value=tribe._id, checked=tribe.checked )
+            label(for=tribe._id) #{tribe.tribe_name}
+            br
     button.btn.btn-primary(type='submit') Submit
 
   if errors 
